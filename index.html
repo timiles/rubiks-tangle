@@ -1,0 +1,74 @@
+<html>
+    <title>Rubik's Tangle solver</title>
+    <script src="js/tangle.js"></script> 
+    <script>
+        
+        function createTileDiv(tile) {
+            var tileDiv = document.createElement('div');
+            tileDiv.className = 'tile rotate-' + tile.rotation;
+            tileDiv.style.backgroundImage = 'url(img/' + tile.definition + '.png)';
+            return tileDiv;
+        }
+        
+        function showAvailableTiles() {
+            var tiles = createTiles();
+            var availableTilesDiv = document.getElementById('availableTiles');
+            
+            for (var i = 0; i < tiles.length; i++) {
+                availableTilesDiv.appendChild(createTileDiv(tiles[i]));
+            }
+        }
+
+        
+        function go() {
+            var tiles = createTiles();
+            var solver = new TangleSolver(tiles);
+            var solution = solver.solve();
+            
+            var solutionDiv = document.getElementById('solution');
+            for (var i = 0; i < solution.length; i++) {
+                solutionDiv.appendChild(createTileDiv(solution[i]));
+            }
+            
+        }
+        
+        
+    </script>
+    <style>
+        #availableTiles div { margin: 0 5px 5px 0; }
+        #solution { width: 260px; }
+        .tile-container:after {
+            content: '';
+            display: block;
+            clear: both;
+        }
+        .tile {
+            width: 52px;
+            height: 52px;
+            float: left;
+        }
+        .tile.rotate-1  {
+            transform: rotate(90deg);
+        }
+        .tile.rotate-2  {
+            transform: rotate(180deg);
+        }
+        .tile.rotate-3  {
+            transform: rotate(270deg);
+        }
+    </style>
+
+    <body onload="showAvailableTiles()">
+        <h1>Rubik's Tangle solver</h1>
+    
+        <h2>Available tiles</h2>
+        
+        <div id="availableTiles" class="tile-container"></div>
+        
+        <button onclick="go()">Go</button>
+        
+        <div id="solution" class="tile-container"></div>
+        
+    </body>
+
+</html>
