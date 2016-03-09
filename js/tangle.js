@@ -30,19 +30,27 @@ var TangleSolver = function(tiles) {
     var self = this;
     self.tiles = tiles;
     
+    var getPosition = function(index) {
+        return {
+            x: index % 5,
+            y: Math.floor(index / 5)
+        };
+    }
+
     var isValidNextTile = function(placedTiles, tile) {
-        var position = placedTiles.length;
-        if (position == 0) { return true; }
-        if (position % 5 != 0) {
+        var index = placedTiles.length;
+        if (index == 0) { return true; }
+        var position = getPosition(index);
+        if (position.x > 0) {
             // not start of row: check against tile to its left
-            var left = placedTiles[position - 1];
+            var left = placedTiles[index - 1];
             if (left.F() != tile.A() || left.E() != tile.B()) {
                 return false;
             }
         }
-        if (position > 4) {
+        if (position.y > 0) {
             // not top row: check against tile above
-            var above = placedTiles[position - 5];
+            var above = placedTiles[index - 5];
             if (above.C() != tile.H() || above.D() != tile.G()) {
                 return false;
             }
@@ -51,7 +59,7 @@ var TangleSolver = function(tiles) {
         // if we didn't fail already, looks like it's good! hawayyyy!!!
         return true;
     }
-
+    
     function placeNextTile(placedTiles, availableTiles) {
         var triedTiles = new Array();
 
@@ -64,6 +72,7 @@ var TangleSolver = function(tiles) {
                 if (isValidNextTile(placedTiles, tile)) {
                     // pop it in
                     placedTiles.push(tile);
+                    
                     if (placedTiles.length == 25) {
                         // found a solution! return. HAWAYYYYYY!!!!
                         return placedTiles;
@@ -71,7 +80,6 @@ var TangleSolver = function(tiles) {
 
                     try {
                         return placeNextTile(placedTiles, availableTiles.concat(triedTiles));
-
                     }
                     catch (e) {
                         if (e == 'Deadend') {
