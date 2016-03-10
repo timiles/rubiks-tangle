@@ -5,6 +5,10 @@
         <title>Rubik's Tangle solver</title>
         <script src="js/tangle.js"></script> 
         <script>
+             
+            if (!window.Worker) { alert('Please use a modern browser which supports HTML5 Web Workers'); } 
+
+            var tileDivs = new Array();
             
             function createTileDiv(tile) {
                 var tileDiv = document.createElement('div');
@@ -21,22 +25,67 @@
                     availableTilesDiv.appendChild(createTileDiv(tiles[i]));
                 }
             }
-
+            
+            function placeTile(x, y, definition, rotation) {
+                tileDivs[y][x].style.backgroundImage = 'url(img/' + definition + '.png)';
+                tileDivs[y][x].style.transform = getTransformStyleForRotation(rotation);
+            }
+            
+            function getTransformStyleForRotation(rotation) {
+                switch (rotation) {
+                    case 0: return '';
+                    case 1: return 'rotate(90deg)';
+                    case 2: return 'rotate(180deg)';
+                    case 3: return 'rotate(270deg)';
+                }
+            }
+            
+            function removeTile(x, y) {
+                tileDivs[y][x].style.backgroundImage = '';
+            }
+            
             function go() {
-                var tiles = createTiles();
-                var solver = new TangleSolver(tiles);
-                var solution = solver.solve();
-                
-                var solutionDiv = document.getElementById('solution');
-                for (var i = 0; i < solution.length; i++) {
-                    solutionDiv.appendChild(createTileDiv(solution[i]));
+                var solutionTable = document.getElementById('solution');
+                for (var y = 0; y < 5; y++) {
+                    var tr = document.createElement('tr');
+                    var tiles = new Array();
+                    for (var x = 0; x < 5; x++) {
+                        var td = document.createElement('td');
+                        var tileDiv = document.createElement('div');
+                        tileDiv.className = 'tile';
+                        td.appendChild(tileDiv);
+                        tiles.push(tileDiv);
+                        tr.appendChild(td);
+                    }
+                    tileDivs.push(tiles);
+                    solutionTable.appendChild(tr);
                 }
                 
+                var tangleSolver = new Worker("js/tangle.js");
+                tangleSolver.onmessage = OnTangleSolverWorkerMessage; 
+                tangleSolver.postMessage('start');
             }
+            
+            function OnTangleSolverWorkerMessage(evt) {
+                switch (evt.data.event) {
+                    case 'onTilePlaced': {
+                        placeTile(evt.data.position.x, evt.data.position.y, evt.data.tile.definition, evt.data.tile.rotation);
+                        return;
+                    }
+                    case 'onTileRemoved': {
+                        removeTile(evt.data.position.x, evt.data.position.y);
+                        return;
+                    }
+                }
+            }
+            
         </script>
         <style>
             #availableTiles div { margin: 0 5px 5px 0; }
             #solution { width: 260px; }
+            .tile-container .tile {
+                float: left;
+            }
             .tile-container:after {
                 content: '';
                 display: block;
@@ -45,16 +94,6 @@
             .tile {
                 width: 52px;
                 height: 52px;
-                float: left;
-            }
-            .tile.rotate-1  {
-                transform: rotate(90deg);
-            }
-            .tile.rotate-2  {
-                transform: rotate(180deg);
-            }
-            .tile.rotate-3  {
-                transform: rotate(270deg);
             }
         </style>
     </head>
@@ -68,7 +107,7 @@
         
         <button onclick="go()">Go</button>
         
-        <div id="solution" class="tile-container"></div>
+        <table id="solution"></table>
         
     </body>
 

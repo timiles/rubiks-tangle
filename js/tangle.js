@@ -26,7 +26,7 @@ var Tile = function(a, b, c, d) {
 	self.info = function() { return self.ends + ", " + self.rotation; }
 };
 
-var TangleSolver = function(tiles) {
+var TangleSolver = function(tiles, onTilePlaced, onTileRemoved) {
     var self = this;
     self.tiles = tiles;
     
@@ -61,6 +61,7 @@ var TangleSolver = function(tiles) {
     }
     
     function placeNextTile(placedTiles, availableTiles) {
+        var position = getPosition(placedTiles.length);
         var triedTiles = new Array();
 
         while (availableTiles.length > 0) {
@@ -72,6 +73,7 @@ var TangleSolver = function(tiles) {
                 if (isValidNextTile(placedTiles, tile)) {
                     // pop it in
                     placedTiles.push(tile);
+                    onTilePlaced(position, tile);
                     
                     if (placedTiles.length == 25) {
                         // found a solution! return. HAWAYYYYYY!!!!
@@ -84,6 +86,7 @@ var TangleSolver = function(tiles) {
                     catch (e) {
                         if (e == 'Deadend') {
                             placedTiles.pop();
+                            onTileRemoved(position);
                         }
                         else { throw e; }
                     }
@@ -119,4 +122,23 @@ function createTiles() {
     // 25th tile is a duplicate
     tiles.push(new Tile('y', 'g', 'r', 'b'));
     return tiles;
+}
+
+
+onmessage = OnCreatorMessage; 
+
+function onTilePlaced(position, tile) {
+    postMessage({ event: 'onTilePlaced', position, tile: { definition: tile.definition, rotation: tile.rotation } });
+}
+
+function onTileRemoved(position) {
+    postMessage({ event: 'onTileRemoved', position });    
+}
+
+function OnCreatorMessage(evt) {
+    if (evt.data == 'start') {
+        var tiles = createTiles();
+        var solver = new TangleSolver(tiles, onTilePlaced, onTileRemoved);
+        solver.solve();
+    }
 }
