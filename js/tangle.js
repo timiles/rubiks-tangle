@@ -128,11 +128,11 @@ function createTiles() {
 onmessage = OnCreatorMessage; 
 
 function onTilePlaced(position, tile) {
-    postMessage({ event: 'onTilePlaced', position, tile: { definition: tile.definition, rotation: tile.rotation } });
+    postMessage({ event: 'onTilePlaced', position: position, tile: { definition: tile.definition, rotation: tile.rotation } });
 }
 
 function onTileRemoved(position) {
-    postMessage({ event: 'onTileRemoved', position });    
+    postMessage({ event: 'onTileRemoved', position: position });    
 }
 
 function OnCreatorMessage(evt) {
