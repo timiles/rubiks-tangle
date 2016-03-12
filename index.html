@@ -61,9 +61,9 @@
                     solutionTable.appendChild(tr);
                 }
                 
-                var tangleSolver = new Worker("js/tangle.js");
-                tangleSolver.onmessage = OnTangleSolverWorkerMessage; 
-                tangleSolver.postMessage('start');
+                var tangleWorker = new Worker("js/tangleworker.js");
+                tangleWorker.onmessage = OnTangleSolverWorkerMessage; 
+                tangleWorker.postMessage('start');
             }
             
             function OnTangleSolverWorkerMessage(evt) {
