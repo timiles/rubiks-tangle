@@ -26,9 +26,30 @@
                 }
             }
             
+            var Counter = function(onChanged) {
+                var self = this;
+                self.count = 0;
+                
+                self.increment = function() {
+                    self.count++;
+                    if (onChanged) {
+                        onChanged(self.count);
+                    }
+                }
+            }
+            
+            function updateCounter(count) {
+                if (count % 100 == 0) {
+                    counterP.innerText = count;
+                }
+            }
+            
+            var counter = new Counter(updateCounter);
+            
             function placeTile(x, y, definition, rotation) {
                 tileDivs[y][x].style.backgroundImage = 'url(img/' + definition + '.png)';
                 tileDivs[y][x].style.transform = getTransformStyleForRotation(rotation);
+                counter.increment();
             }
             
             function getTransformStyleForRotation(rotation) {
@@ -45,6 +66,7 @@
             }
             
             function go() {
+                counterP = document.getElementById('counter');
                 var solutionTable = document.getElementById('solution');
                 for (var y = 0; y < 5; y++) {
                     var tr = document.createElement('tr');
@@ -112,6 +134,8 @@
         <button onclick="go()">Go</button>
         
         <table id="solution"></table>
+        
+        <p id="counter"></p>
         
     </body>
 
