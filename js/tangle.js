@@ -24,6 +24,9 @@ var Tile = function(a, b, c, d) {
 	self.H = function() { return self.getEnd(7); }
 
 	self.info = function() { return self.ends + ", " + self.rotation; }
+    
+    // return object without functions for structured cloning
+    self.toMessage = function() { return { definition: self.definition, rotation: self.rotation } };
 };
 
 var TangleSolver = function(tiles, onTilePlaced, onTileRemoved) {
@@ -128,7 +131,7 @@ function createTiles() {
 onmessage = OnCreatorMessage; 
 
 function onTilePlaced(position, tile) {
-    postMessage({ event: 'onTilePlaced', position: position, tile: { definition: tile.definition, rotation: tile.rotation } });
+    postMessage({ event: 'onTilePlaced', position: position, tile: tile.toMessage() });
 }
 
 function onTileRemoved(position) {
