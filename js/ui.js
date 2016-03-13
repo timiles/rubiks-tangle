@@ -23,9 +23,9 @@ document.addEventListener("DOMContentLoaded", function(event) {
 });
 
 // Counter
-var counter = new Counter(function(count) {
-    if (count % 100 == 0) {
-        counterP.innerText = count;
+var counter = new Counter(function(value) {
+    if (value % 100 == 0) {
+        displayCounterValue(value);
     }
 });
 
@@ -77,6 +77,10 @@ function logError(e) {
 }
 
 // UI Helpers
+function displayCounterValue(count) {
+    counterP.innerText = Number(count).toLocaleString();    
+}
+
 function createTileDiv(tileDefinition) {
     var tileDiv = document.createElement('div');
     tileDiv.className = 'tile';
@@ -132,7 +136,7 @@ function onSolverWorkerMessage(evt) {
             return;
         }
         case 'onSolutionFound': {
-            counterP.innerText = counter.count;
+            displayCounterValue(counter.value);
             return;
         }
     }

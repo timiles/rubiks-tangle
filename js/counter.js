@@ -1,11 +1,11 @@
 var Counter = function(onChanged) {
     var self = this;
-    self.count = 0;
+    self.value = 0;
     
     self.increment = function() {
-        self.count++;
+        self.value++;
         if (onChanged) {
-            onChanged(self.count);
+            onChanged(self.value);
         }
     }
 }
