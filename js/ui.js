@@ -104,7 +104,7 @@ function onSolverWorkerMessage(evt) {
     }
 }
 
-function go() {    
+function findSolution() {    
     var solverWorker = new Worker("js/solverWorker.js");
     solverWorker.onerror = logError;
     solverWorker.onmessage = onSolverWorkerMessage; 
