@@ -4,7 +4,22 @@ if (!window.Worker) { alert('Please use a modern browser which supports HTML5 We
 // UI Elements
 document.addEventListener("DOMContentLoaded", function(event) {
     counterP = document.getElementById('counter');
+    
     tileDivs = new Array();
+    var solutionTable = document.getElementById('solution');
+    for (var y = 0; y < 5; y++) {
+        var tr = document.createElement('tr');
+        var tiles = new Array();
+        for (var x = 0; x < 5; x++) {
+            var td = document.createElement('td');
+            var tileDiv = createTileDiv();
+            td.appendChild(tileDiv);
+            tiles.push(tileDiv);
+            tr.appendChild(td);
+        }
+        tileDivs.push(tiles);
+        solutionTable.appendChild(tr);
+    }    
 });
 
 // Counter
@@ -85,22 +100,7 @@ function onSolverWorkerMessage(evt) {
     }
 }
 
-function go() {
-    var solutionTable = document.getElementById('solution');
-    for (var y = 0; y < 5; y++) {
-        var tr = document.createElement('tr');
-        var tiles = new Array();
-        for (var x = 0; x < 5; x++) {
-            var td = document.createElement('td');
-            var tileDiv = createTileDiv();
-            td.appendChild(tileDiv);
-            tiles.push(tileDiv);
-            tr.appendChild(td);
-        }
-        tileDivs.push(tiles);
-        solutionTable.appendChild(tr);
-    }
-    
+function go() {    
     var solverWorker = new Worker("js/solverWorker.js");
     solverWorker.onerror = logError;
     solverWorker.onmessage = onSolverWorkerMessage; 
