@@ -1,4 +1,4 @@
-importScripts('tangle.js');
+importScripts('solver.js');
 
 onmessage = OnCreatorMessage; 
 
