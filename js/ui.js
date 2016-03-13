@@ -50,6 +50,32 @@ function createTiles() {
     return tiles;
 }
 
+// utils
+// REF: http://stackoverflow.com/a/2450976/487544
+function shuffle(array) {
+    var currentIndex = array.length, temporaryValue, randomIndex;
+
+    // While there remain elements to shuffle...
+    while (0 !== currentIndex) {
+
+        // Pick a remaining element...
+        randomIndex = Math.floor(Math.random() * currentIndex);
+        currentIndex -= 1;
+
+        // And swap it with the current element.
+        temporaryValue = array[currentIndex];
+        array[currentIndex] = array[randomIndex];
+        array[randomIndex] = temporaryValue;
+    }
+
+    return array;
+}
+
+function logError(e) {
+    alert(e.message + ' -- ' + e.filename + ': line ' + e.lineno);
+    console.error(e);
+}
+
 // UI Helpers
 function createTileDiv(tileDefinition) {
     var tileDiv = document.createElement('div');
@@ -62,10 +88,18 @@ function createTileDiv(tileDefinition) {
 
 function showAvailableTiles() {
     var availableTilesDiv = document.getElementById('availableTiles');
+    while (availableTilesDiv.childNodes.length > 0) {
+        availableTilesDiv.removeChild(availableTilesDiv.childNodes[0]);
+    }
     
     for (var i = 0; i < tiles.length; i++) {
         availableTilesDiv.appendChild(createTileDiv(tiles[i]));
     }
+}
+
+function randomiseTiles() {
+    shuffle(tiles);
+    showAvailableTiles();    
 }
 
 function placeTile(x, y, definition, rotation) {
@@ -108,10 +142,5 @@ function findSolution() {
     var solverWorker = new Worker("js/solverWorker.js");
     solverWorker.onerror = logError;
     solverWorker.onmessage = onSolverWorkerMessage; 
-    solverWorker.postMessage(createTiles());
-}
-
-function logError(e) {
-    alert(e.message + ' -- ' + e.filename + ': line ' + e.lineno);
-    console.error(e);
+    solverWorker.postMessage(tiles);
 }
