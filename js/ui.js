@@ -23,7 +23,7 @@ document.addEventListener("DOMContentLoaded", function(event) {
 });
 
 // Counter
-var counter = new Counter(function (count) {
+var counter = new Counter(function(count) {
     if (count % 100 == 0) {
         counterP.innerText = count;
     }
@@ -95,6 +95,10 @@ function onSolverWorkerMessage(evt) {
         }
         case 'onTileRemoved': {
             removeTile(evt.data.position.x, evt.data.position.y);
+            return;
+        }
+        case 'onSolutionFound': {
+            counterP.innerText = counter.count;
             return;
         }
     }

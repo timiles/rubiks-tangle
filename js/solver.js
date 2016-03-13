@@ -1,4 +1,4 @@
-var TangleSolver = function(tiles, onTilePlaced, onTileRemoved) {
+var Solver = function(tiles, onTilePlaced, onTileRemoved) {
     var self = this;
 
     var Tile = function(definition) {

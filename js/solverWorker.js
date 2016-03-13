@@ -10,7 +10,12 @@ function onTileRemoved(position) {
     postMessage({ event: 'onTileRemoved', position: position });    
 }
 
+function onSolutionFound(tiles) {
+    postMessage({ event: 'onSolutionFound', tiles: tiles.map(function(t) { return t.toMessage(); }) });        
+}
+
 function OnCreatorMessage(evt) {
-    var solver = new TangleSolver(evt.data, onTilePlaced, onTileRemoved);
-    solver.solve();
+    var solver = new Solver(evt.data, onTilePlaced, onTileRemoved);
+    var solution = solver.solve();
+    onSolutionFound(solution);
 }
