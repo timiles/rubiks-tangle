@@ -1,37 +1,38 @@
-var Tile = function(a, b, c, d) {
-	var self = this;
-    self.definition = a + b + c + d;
-	self.ends = a + b + c + d + c + a + b + d;
-
-	self.rotation = 0;
-	self.setRotation = function(rotation) {
-		if (rotation < 0 || rotation >= 4) {
-			throw 'Invalid rotation: ' + rotation;
-		}
-		self.rotation = rotation;
-	}
-	
-	self.getEnd = function(location) {
-		return self.ends[(location + (2 * self.rotation)) % 8];
-	}
-	self.A = function() { return self.getEnd(0); }
-	self.B = function() { return self.getEnd(1); }
-	self.C = function() { return self.getEnd(2); }
-	self.D = function() { return self.getEnd(3); }
-	self.E = function() { return self.getEnd(4); }
-	self.F = function() { return self.getEnd(5); }
-	self.G = function() { return self.getEnd(6); }
-	self.H = function() { return self.getEnd(7); }
-
-	self.info = function() { return self.ends + ", " + self.rotation; }
-    
-    // return object without functions for structured cloning
-    self.toMessage = function() { return { definition: self.definition, rotation: self.rotation } };
-};
-
 var TangleSolver = function(tiles, onTilePlaced, onTileRemoved) {
     var self = this;
-    self.tiles = tiles;
+
+    var Tile = function(definition) {
+        var self = this;
+        self.definition = definition;
+        self.ends = definition + definition[2] + definition[0] + definition[1] + definition[3];
+
+        self.rotation = 0;
+        self.setRotation = function(rotation) {
+            if (rotation < 0 || rotation >= 4) {
+                throw 'Invalid rotation: ' + rotation;
+            }
+            self.rotation = rotation;
+        }
+        
+        self.getEnd = function(location) {
+            return self.ends[(location + (2 * self.rotation)) % 8];
+        }
+        self.A = function() { return self.getEnd(0); }
+        self.B = function() { return self.getEnd(1); }
+        self.C = function() { return self.getEnd(2); }
+        self.D = function() { return self.getEnd(3); }
+        self.E = function() { return self.getEnd(4); }
+        self.F = function() { return self.getEnd(5); }
+        self.G = function() { return self.getEnd(6); }
+        self.H = function() { return self.getEnd(7); }
+
+        self.info = function() { return self.ends + ", " + self.rotation; }
+        
+        // return object without functions for structured cloning
+        self.toMessage = function() { return { definition: self.definition, rotation: self.rotation } };
+    };
+
+    self.tiles = tiles.map(function(definition) { return new Tile(definition); });
     
     var getPosition = function(index) {
         return {
@@ -108,21 +109,3 @@ var TangleSolver = function(tiles, onTilePlaced, onTileRemoved) {
         return placeNextTile(new Array(), self.tiles);
     }
 };
-
-function createTiles() {
-    var tiles = new Array();
-    var colours = ['b', 'g', 'r', 'y'];
-
-    for (var a in colours)
-    for (var b in colours)
-    for (var c in colours)
-    for (var d in colours) {
-        if (a == b || a == c || a == d || b == c || b == d || c == d) {
-            continue;
-        }
-        tiles.push(new Tile(colours[a], colours[b], colours[c], colours[d]));
-    }
-    // 25th tile is a duplicate
-    tiles.push(new Tile('y', 'g', 'r', 'b'));
-    return tiles;
-}

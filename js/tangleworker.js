@@ -11,9 +11,6 @@ function onTileRemoved(position) {
 }
 
 function OnCreatorMessage(evt) {
-    if (evt.data == 'start') {
-        var tiles = createTiles();
-        var solver = new TangleSolver(tiles, onTilePlaced, onTileRemoved);
-        solver.solve();
-    }
+    var solver = new TangleSolver(evt.data, onTilePlaced, onTileRemoved);
+    solver.solve();
 }
