@@ -32,8 +32,8 @@ document.addEventListener("DOMContentLoaded", function(event) {
 
 // Counter
 var counter = new Counter();
-counter.onValueChanged = function(value) {
-    displayCounterValue(value);
+counter.onValueChanged = function() {
+    UI.Counter.innerText = this.getValueFormatted();
 };
 
 // Tiles
@@ -84,10 +84,6 @@ function logError(e) {
 }
 
 // UI Helpers
-function displayCounterValue(count) {
-    UI.Counter.innerText = Number(count).toLocaleString();    
-}
-
 function createTileDiv(tileDefinition) {
     var tileDiv = document.createElement('div');
     tileDiv.className = 'tile';
@@ -191,8 +187,8 @@ function testAlgorithmPerformance() {
     currentCounterTd = counterTd;
 
     currentCounter = new Counter();
-    currentCounter.onValueChanged = function(value) {
-        currentCounterTd.innerText = value;
+    currentCounter.onValueChanged = function() {
+        currentCounterTd.innerText = this.getValueFormatted();
     }
     
     var solverWorker = new Worker("js/solverWorker.js");

@@ -3,10 +3,15 @@ importScripts('solver.js');
 onmessage = OnCreatorMessage; 
 
 var tileCheckedCount = 0;
+
+function postTileCheckedCountChangedMessage() {
+    postMessage({ event: 'onTileCheckedCountChanged', amount: tileCheckedCount });    
+}
+
 function onTileChecked() {
     tileCheckedCount++;
     if (tileCheckedCount == 1000) {
-        postMessage({ event: 'onTileCheckedCountChanged', amount: tileCheckedCount });
+        postTileCheckedCountChangedMessage();    
         tileCheckedCount = 0;
     }
 }
@@ -21,7 +26,7 @@ function onTileRemoved(position) {
 
 function onSolutionFound(tiles) {
     if (tileCheckedCount > 0) {
-        postMessage({ event: 'onTileCheckedCountChanged', count: tileCheckedCount });
+        postTileCheckedCountChangedMessage();    
     }
     postMessage({ event: 'onSolutionFound', tiles: tiles.map(function(t) { return t.toMessage(); }) });        
 }

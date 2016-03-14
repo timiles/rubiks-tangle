@@ -7,7 +7,11 @@ var Counter = function() {
     self.increment = function(amount) {
         self.value += amount;
         if (self.onValueChanged) {
-            self.onValueChanged(self.value);
+            self.onValueChanged();
         }
-    }    
+    }
+    
+    self.getValueFormatted = function() {
+        return Number(self.value).toLocaleString();
+    }
 }
