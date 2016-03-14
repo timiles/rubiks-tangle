@@ -3,25 +3,31 @@ if (!window.Worker) { alert('Please use a modern browser which supports HTML5 We
 
 // UI Elements
 document.addEventListener("DOMContentLoaded", function(event) {
-    counterP = document.getElementById('counter');
+    UI = {
+        AvailableTilesContainer: document.getElementById('availableTiles'), 
+        TileGrid: createTileGrid(),
+        Counter: document.getElementById('counter'),
+        ResultsTable: document.getElementById("algorithmPerformanceResults")
+    };
     
-    tileDivs = new Array();
-    var solutionTable = document.getElementById('solution');
-    for (var y = 0; y < 5; y++) {
-        var tr = document.createElement('tr');
-        var tiles = new Array();
-        for (var x = 0; x < 5; x++) {
-            var td = document.createElement('td');
-            var tileDiv = createTileDiv();
-            td.appendChild(tileDiv);
-            tiles.push(tileDiv);
-            tr.appendChild(td);
+    function createTileGrid() {
+        var tileGrid = new Array();
+        var solutionTable = document.getElementById('solution');
+        for (var y = 0; y < 5; y++) {
+            var tr = document.createElement('tr');
+            var tiles = new Array();
+            for (var x = 0; x < 5; x++) {
+                var td = document.createElement('td');
+                var tileDiv = createTileDiv();
+                td.appendChild(tileDiv);
+                tiles.push(tileDiv);
+                tr.appendChild(td);
+            }
+            solutionTable.appendChild(tr);
+            tileGrid.push(tiles);
         }
-        tileDivs.push(tiles);
-        solutionTable.appendChild(tr);
+        return tileGrid;
     }
-    
-    resultsTable = document.getElementById("algorithmPerformanceResults");
 });
 
 // Counter
@@ -81,7 +87,7 @@ function logError(e) {
 
 // UI Helpers
 function displayCounterValue(count) {
-    counterP.innerText = Number(count).toLocaleString();    
+    UI.Counter.innerText = Number(count).toLocaleString();    
 }
 
 function createTileDiv(tileDefinition) {
@@ -94,13 +100,12 @@ function createTileDiv(tileDefinition) {
 }
 
 function showAvailableTiles() {
-    var availableTilesDiv = document.getElementById('availableTiles');
-    while (availableTilesDiv.childNodes.length > 0) {
-        availableTilesDiv.removeChild(availableTilesDiv.childNodes[0]);
+    while (UI.AvailableTilesContainer.childNodes.length > 0) {
+        UI.AvailableTilesContainer.removeChild(UI.AvailableTilesContainer.childNodes[0]);
     }
     
     for (var i = 0; i < tiles.length; i++) {
-        availableTilesDiv.appendChild(createTileDiv(tiles[i]));
+        UI.AvailableTilesContainer.appendChild(createTileDiv(tiles[i]));
     }
 }
 
@@ -110,8 +115,8 @@ function randomiseTiles() {
 }
 
 function placeTile(x, y, definition, rotation) {
-    tileDivs[y][x].style.backgroundImage = 'url(img/' + definition + '.png)';
-    tileDivs[y][x].style.transform = getTransformStyleForRotation(rotation);
+    UI.TileGrid[y][x].style.backgroundImage = 'url(img/' + definition + '.png)';
+    UI.TileGrid[y][x].style.transform = getTransformStyleForRotation(rotation);
     counter.increment();
 }
 
@@ -125,7 +130,7 @@ function getTransformStyleForRotation(rotation) {
 }
 
 function removeTile(x, y) {
-    tileDivs[y][x].style.backgroundImage = '';
+    UI.TileGrid[y][x].style.backgroundImage = '';
 }
 
 function onSolverWorkerMessage(evt) {
@@ -186,7 +191,7 @@ function testAlgorithmPerformance() {
     var counterTd = document.createElement('td');
     tr.appendChild(runTd);
     tr.appendChild(counterTd);
-    resultsTable.appendChild(tr);
+    UI.ResultsTable.appendChild(tr);
     currentCounterTd = counterTd;
 
     counter = new Counter();
