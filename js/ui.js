@@ -33,9 +33,7 @@ document.addEventListener("DOMContentLoaded", function(event) {
 // Counter
 var counter = new Counter();
 counter.onValueChanged = function(value) {
-    if (value % 100 == 0) {
-        displayCounterValue(value);
-    }
+    displayCounterValue(value);
 };
 
 // Tiles
@@ -117,7 +115,6 @@ function randomiseTiles() {
 function placeTile(x, y, definition, rotation) {
     UI.TileGrid[y][x].style.backgroundImage = 'url(img/' + definition + '.png)';
     UI.TileGrid[y][x].style.transform = getTransformStyleForRotation(rotation);
-    counter.increment();
 }
 
 function getTransformStyleForRotation(rotation) {
@@ -135,16 +132,16 @@ function removeTile(x, y) {
 
 function onSolverWorkerMessage(evt) {
     switch (evt.data.event) {
+        case 'onTileCheckedCountChanged': {
+            counter.increment(evt.data.amount);
+            return;
+        }
         case 'onTilePlaced': {
             placeTile(evt.data.position.x, evt.data.position.y, evt.data.tile.definition, evt.data.tile.rotation);
             return;
         }
         case 'onTileRemoved': {
             removeTile(evt.data.position.x, evt.data.position.y);
-            return;
-        }
-        case 'onSolutionFound': {
-            displayCounterValue(counter.value);
             return;
         }
     }
@@ -158,19 +155,18 @@ function findSolution() {
 }
 
 
-var counter;
+var currentCounter;
 var currentCounterTd;
 var currentRunNumber = 1;
 var testSolverWorker;
 
 function onPerformanceTestMessage(evt) {
     switch (evt.data.event) {
-        case 'onTilePlaced': {
-            counter.increment();
+        case 'onTileCheckedCountChanged': {
+            currentCounter.increment(evt.data.amount);
             return;
         }
         case 'onSolutionFound': {
-            currentCounterTd.innerText = counter.value;
             testSolverWorker.terminate();
             if (currentRunNumber < 10) {
                 currentRunNumber++;
@@ -194,11 +190,9 @@ function testAlgorithmPerformance() {
     UI.ResultsTable.appendChild(tr);
     currentCounterTd = counterTd;
 
-    counter = new Counter();
-    counter.onValueChanged = function(value) {
-        if (value % 100 == 0) {
-            currentCounterTd.innerText = value;
-        }
+    currentCounter = new Counter();
+    currentCounter.onValueChanged = function(value) {
+        currentCounterTd.innerText = value;
     }
     
     var solverWorker = new Worker("js/solverWorker.js");

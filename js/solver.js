@@ -1,4 +1,4 @@
-var Solver = function(tiles, onTilePlaced, onTileRemoved) {
+var Solver = function(tiles, onTileChecked, onTilePlaced, onTileRemoved) {
     var self = this;
 
     var Tile = function(definition) {
@@ -42,6 +42,8 @@ var Solver = function(tiles, onTilePlaced, onTileRemoved) {
     }
 
     var isValidNextTile = function(placedTiles, tile) {
+        onTileChecked();
+        
         var index = placedTiles.length;
         if (index == 0) { return true; }
         var position = getPosition(index);

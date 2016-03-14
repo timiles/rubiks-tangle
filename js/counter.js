@@ -4,8 +4,8 @@ var Counter = function() {
     self.value = 0;
     self.onValueChanged;
     
-    self.increment = function() {
-        self.value++;
+    self.increment = function(amount) {
+        self.value += amount;
         if (self.onValueChanged) {
             self.onValueChanged(self.value);
         }
