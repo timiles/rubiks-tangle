@@ -19,15 +19,18 @@ document.addEventListener("DOMContentLoaded", function(event) {
         }
         tileDivs.push(tiles);
         solutionTable.appendChild(tr);
-    }    
+    }
+    
+    resultsTable = document.getElementById("algorithmPerformanceResults");
 });
 
 // Counter
-var counter = new Counter(function(value) {
+var counter = new Counter();
+counter.onValueChanged = function(value) {
     if (value % 100 == 0) {
         displayCounterValue(value);
     }
-});
+};
 
 // Tiles
 var tiles = createTiles();
@@ -147,4 +150,55 @@ function findSolution() {
     solverWorker.onerror = logError;
     solverWorker.onmessage = onSolverWorkerMessage; 
     solverWorker.postMessage(tiles);
+}
+
+
+var counter;
+var currentCounterTd;
+var currentRunNumber = 1;
+var testSolverWorker;
+
+function onPerformanceTestMessage(evt) {
+    switch (evt.data.event) {
+        case 'onTilePlaced': {
+            counter.increment();
+            return;
+        }
+        case 'onSolutionFound': {
+            currentCounterTd.innerText = counter.value;
+            testSolverWorker.terminate();
+            if (currentRunNumber < 10) {
+                currentRunNumber++;
+                testAlgorithmPerformance();
+            }
+            return;
+        }
+    }
+}
+
+function testAlgorithmPerformance() {
+    
+    shuffle(tiles);
+    
+    var tr = document.createElement('tr');
+    var runTd = document.createElement('td');
+    runTd.innerText = currentRunNumber.toString();
+    var counterTd = document.createElement('td');
+    tr.appendChild(runTd);
+    tr.appendChild(counterTd);
+    resultsTable.appendChild(tr);
+    currentCounterTd = counterTd;
+
+    counter = new Counter();
+    counter.onValueChanged = function(value) {
+        if (value % 100 == 0) {
+            currentCounterTd.innerText = value;
+        }
+    }
+    
+    var solverWorker = new Worker("js/solverWorker.js");
+    solverWorker.onerror = logError;
+    solverWorker.onmessage = onPerformanceTestMessage; 
+    solverWorker.postMessage(tiles);
+    testSolverWorker = solverWorker;
 }

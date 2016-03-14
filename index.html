@@ -6,6 +6,9 @@
         <script src="js/counter.js" type="text/javascript"></script>
         <script src="js/ui.js" type="text/javascript"></script>
         <style>
+            table {
+                border: 1px solid black;
+            }
             #availableTiles div { margin: 0 5px 5px 0; }
             #solution {
                 width: 260px;
@@ -42,6 +45,18 @@
         
         <p id="counter"></p>
         
+        <button onclick="testAlgorithmPerformance()">Test algorithm performance</button>
+        
+        <table id="algorithmPerformanceResults">
+            <thead>
+                <tr>
+                    <th>Run #</th>
+                    <th>Start time</th>
+                    <th>End time</th>
+                    <th>Tile placements</th>
+                </tr>
+            </thead>
+        </table>
     </body>
 
 </html>
