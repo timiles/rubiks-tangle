@@ -7,7 +7,9 @@ document.addEventListener("DOMContentLoaded", function(event) {
         AvailableTilesContainer: document.getElementById('availableTiles'), 
         TileGrid: createTileGrid(),
         Counter: document.getElementById('counter'),
-        ResultsTable: document.getElementById("algorithmPerformanceResults")
+        ResultsTable: document.getElementById("algorithmPerformanceResults"),
+        StartTime: document.getElementById('startTime'),
+        EndTime: document.getElementById('endTime')        
     };
     
     function createTileGrid() {
@@ -147,7 +149,7 @@ function findSolution() {
     var solverWorker = new Worker("js/solverWorker.js");
     solverWorker.onerror = logError;
     solverWorker.onmessage = onSolverWorkerMessage; 
-    solverWorker.postMessage(tiles);
+    solverWorker.postMessage({ tiles: tiles });
 }
 
 
@@ -168,12 +170,18 @@ function onPerformanceTestMessage(evt) {
                 currentRunNumber++;
                 testAlgorithmPerformance();
             }
+            else {
+                UI.EndTime.innerText = new Date().toLocaleTimeString();
+            }
             return;
         }
     }
 }
 
 function testAlgorithmPerformance() {
+    if (!UI.StartTime.innerText) {
+        UI.StartTime.innerText = new Date().toLocaleTimeString();
+    }
     
     shuffle(tiles);
     
@@ -194,6 +202,6 @@ function testAlgorithmPerformance() {
     var solverWorker = new Worker("js/solverWorker.js");
     solverWorker.onerror = logError;
     solverWorker.onmessage = onPerformanceTestMessage; 
-    solverWorker.postMessage(tiles);
+    solverWorker.postMessage({ tiles: tiles, subscribedEvents: ['onTileCheckedCountChanged', 'onSolutionFound'] });
     testSolverWorker = solverWorker;
 }
