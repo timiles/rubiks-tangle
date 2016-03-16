@@ -183,7 +183,7 @@ function testAlgorithmPerformance() {
         UI.StartTime.innerText = new Date().toLocaleTimeString();
     }
     
-    shuffle(tiles);
+    randomiseTiles();
     
     var tr = document.createElement('tr');
     var runTd = document.createElement('td');
