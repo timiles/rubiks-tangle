@@ -33,31 +33,56 @@ var Solver = function(tiles, onTileChecked, onTilePlaced, onTileRemoved) {
     };
 
     self.tiles = tiles.map(function(definition) { return new Tile(definition); });
+    self.placedTiles = new Array(25);
     
-    var getPosition = function(index) {
+    var indexSequence = [12, 17, 16, 11, 6, 7, 8, 13, 18, 23, 22, 21, 20, 15, 10, 5, 0, 1, 2, 3, 4, 9, 14, 19, 24];
+    
+    function getPosition(index) {
         return {
             x: index % 5,
             y: Math.floor(index / 5)
         };
     }
+    
+    function getGridNumber(position) {
+        if (position.x < 0 || position.x > 4) return -1;
+        if (position.y < 0 || position.y > 4) return -1;
+        return (5 * position.y) + position.x;
+    }
 
-    var isValidNextTile = function(placedTiles, tile) {
+    self.getTileIfExists = function(position) {
+        var gridNumber = getGridNumber(position);
+        if (gridNumber == -1) return undefined;
+        return self.placedTiles[gridNumber];
+    }
+
+    self.isValidNextTile = function(tile, position) {
         onTileChecked();
-        
-        var index = placedTiles.length;
-        if (index == 0) { return true; }
-        var position = getPosition(index);
-        if (position.x > 0) {
-            // not start of row: check against tile to its left
-            var left = placedTiles[index - 1];
-            if (left.F() != tile.A() || left.E() != tile.B()) {
+
+        var above = self.getTileIfExists({ x: position.x, y: position.y - 1 });
+        if (above) {
+            if (above.C() != tile.H() || above.D() != tile.G()) {
                 return false;
             }
         }
-        if (position.y > 0) {
-            // not top row: check against tile above
-            var above = placedTiles[index - 5];
-            if (above.C() != tile.H() || above.D() != tile.G()) {
+         
+        var right = self.getTileIfExists({ x: position.x + 1, y: position.y });
+        if (right) {
+            if (right.A() != tile.F() || right.B() != tile.E()) {
+                return false;
+            }
+        } 
+        
+        var below = self.getTileIfExists({ x: position.x, y: position.y + 1 });
+        if (below) {
+            if (below.H() != tile.C() || below.G() != tile.D()) {
+                return false;
+            }
+        }
+         
+        var left = self.getTileIfExists({ x: position.x - 1, y: position.y }); 
+        if (left) {
+            if (left.F() != tile.A() || left.E() != tile.B()) {
                 return false;
             }
         }
@@ -66,8 +91,9 @@ var Solver = function(tiles, onTileChecked, onTilePlaced, onTileRemoved) {
         return true;
     }
     
-    function placeNextTile(placedTiles, availableTiles) {
-        var position = getPosition(placedTiles.length);
+    self.placeNextTile = function(availableTiles) {
+        var sequenceNumber = 25 - availableTiles.length;
+        var position = getPosition(indexSequence[sequenceNumber]);
         var triedTiles = new Array();
 
         while (availableTiles.length > 0) {
@@ -76,22 +102,24 @@ var Solver = function(tiles, onTileChecked, onTilePlaced, onTileRemoved) {
             for (var rotation=0; rotation<4; rotation++) {
                 tile.setRotation(rotation);
 
-                if (isValidNextTile(placedTiles, tile)) {
+                if (self.isValidNextTile(tile, position)) {
                     // pop it in
-                    placedTiles.push(tile);
+                    var gridNumber = getGridNumber(position);
+                    self.placedTiles[gridNumber] = tile;
                     onTilePlaced(position, tile);
                     
-                    if (placedTiles.length == 25) {
+                    var remainingTiles = availableTiles.concat(triedTiles);
+                    if (remainingTiles.length == 0) {
                         // found a solution! return. HAWAYYYYYY!!!!
-                        return placedTiles;
+                        return self.placedTiles;
                     }
 
                     try {
-                        return placeNextTile(placedTiles, availableTiles.concat(triedTiles));
+                        return self.placeNextTile(remainingTiles);
                     }
                     catch (e) {
                         if (e == 'Deadend') {
-                            placedTiles.pop();
+                            self.placedTiles[gridNumber] = undefined;
                             onTileRemoved(position);
                         }
                         else { throw e; }
@@ -108,6 +136,6 @@ var Solver = function(tiles, onTileChecked, onTilePlaced, onTileRemoved) {
     }
     
     self.solve = function() {
-        return placeNextTile(new Array(), self.tiles);
+        return self.placeNextTile(self.tiles);
     }
 };
