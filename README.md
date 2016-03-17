@@ -1,4 +1,4 @@
-# rubiks-tangle
+# Rubik's Tangle
 JavaScript solution for 5x5 grid of Rubik's Tangle tiles.
 
 # TODO
