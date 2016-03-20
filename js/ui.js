@@ -170,6 +170,10 @@ function findSolution() {
 }
 
 
+function setAsCurrentTime(el) {
+    el.innerText = new Date().toLocaleTimeString();
+}
+
 var currentTestRun;
 
 function onPerformanceTestMessage(evt) {
@@ -184,7 +188,7 @@ function onPerformanceTestMessage(evt) {
                 testAlgorithmPerformance(currentTestRun.runNumber + 1);
             }
             else {
-                UI.EndTime.innerText = new Date().toLocaleTimeString();
+                setAsCurrentTime(UI.EndTime);
             }
             return;
         }
@@ -192,11 +196,11 @@ function onPerformanceTestMessage(evt) {
 }
 
 function testAlgorithmPerformance(runNumber) {
-    if (!UI.StartTime.innerText) {
-        UI.StartTime.innerText = new Date().toLocaleTimeString();
+    runNumber = runNumber || 1;
+    if (runNumber == 1) {
+        setAsCurrentTime(UI.StartTime);
     }
     
-    runNumber = runNumber || 1;
     randomiseTiles();
     
     var solverWorker = new Worker("js/solverWorker.js");
