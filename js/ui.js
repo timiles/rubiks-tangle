@@ -9,7 +9,24 @@ document.addEventListener("DOMContentLoaded", function(event) {
         Counter: document.getElementById('counter'),
         ResultsTable: document.getElementById("algorithmPerformanceResults"),
         StartTime: document.getElementById('startTime'),
-        EndTime: document.getElementById('endTime')        
+        EndTime: document.getElementById('endTime'),
+        
+        addTestRun: function(testRun) {
+            
+            var tr = document.createElement('tr');
+            var runTd = document.createElement('td');
+            runTd.innerText = testRun.runNumber.toString();
+            
+            var counterTd = document.createElement('td');
+            testRun.counter.onValueChanged = function() {
+                counterTd.innerText = this.getValueFormatted();
+            }
+            
+            tr.appendChild(runTd);
+            tr.appendChild(counterTd);
+            UI.ResultsTable.appendChild(tr);
+    
+        }       
     };
     
     function createTileGrid() {
@@ -179,27 +196,15 @@ function testAlgorithmPerformance(runNumber) {
         UI.StartTime.innerText = new Date().toLocaleTimeString();
     }
     
-    randomiseTiles();
-    
     runNumber = runNumber || 1;
-    
-    var tr = document.createElement('tr');
-    var runTd = document.createElement('td');
-    runTd.innerText = runNumber.toString();
-    var counterTd = document.createElement('td');
-    tr.appendChild(runTd);
-    tr.appendChild(counterTd);
-    UI.ResultsTable.appendChild(tr);
-    
-    var counter = new Counter();
-    counter.onValueChanged = function() {
-        currentTestRun.counterTd.innerText = this.getValueFormatted();
-    }
+    randomiseTiles();
     
     var solverWorker = new Worker("js/solverWorker.js");
     solverWorker.onerror = logError;
     solverWorker.onmessage = onPerformanceTestMessage; 
-    solverWorker.postMessage({ tiles: tiles, subscribedEvents: ['onTileCheckedCountChanged', 'onSolutionFound'] });
-    
-    currentTestRun = new TestRun(runNumber, counter, counterTd, solverWorker);
+
+    currentTestRun = new TestRun(runNumber, new Counter(), solverWorker);
+    UI.addTestRun(currentTestRun);
+
+    solverWorker.postMessage({ tiles: tiles, subscribedEvents: ['onTileCheckedCountChanged', 'onSolutionFound'] });    
 }
