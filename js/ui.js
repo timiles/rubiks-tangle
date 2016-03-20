@@ -153,22 +153,18 @@ function findSolution() {
 }
 
 
-var currentCounter;
-var currentCounterTd;
-var currentRunNumber = 1;
-var testSolverWorker;
+var currentTestRun;
 
 function onPerformanceTestMessage(evt) {
     switch (evt.data.event) {
         case 'onTileCheckedCountChanged': {
-            currentCounter.increment(evt.data.amount);
+            currentTestRun.counter.increment(evt.data.amount);
             return;
         }
         case 'onSolutionFound': {
-            testSolverWorker.terminate();
-            if (currentRunNumber < 10) {
-                currentRunNumber++;
-                testAlgorithmPerformance();
+            currentTestRun.solverWorker.terminate();
+            if (currentTestRun.runNumber < 10) {
+                testAlgorithmPerformance(currentTestRun.runNumber + 1);
             }
             else {
                 UI.EndTime.innerText = new Date().toLocaleTimeString();
@@ -178,30 +174,32 @@ function onPerformanceTestMessage(evt) {
     }
 }
 
-function testAlgorithmPerformance() {
+function testAlgorithmPerformance(runNumber) {
     if (!UI.StartTime.innerText) {
         UI.StartTime.innerText = new Date().toLocaleTimeString();
     }
     
     randomiseTiles();
     
+    runNumber = runNumber || 1;
+    
     var tr = document.createElement('tr');
     var runTd = document.createElement('td');
-    runTd.innerText = currentRunNumber.toString();
+    runTd.innerText = runNumber.toString();
     var counterTd = document.createElement('td');
     tr.appendChild(runTd);
     tr.appendChild(counterTd);
     UI.ResultsTable.appendChild(tr);
-    currentCounterTd = counterTd;
-
-    currentCounter = new Counter();
-    currentCounter.onValueChanged = function() {
-        currentCounterTd.innerText = this.getValueFormatted();
+    
+    var counter = new Counter();
+    counter.onValueChanged = function() {
+        currentTestRun.counterTd.innerText = this.getValueFormatted();
     }
     
     var solverWorker = new Worker("js/solverWorker.js");
     solverWorker.onerror = logError;
     solverWorker.onmessage = onPerformanceTestMessage; 
     solverWorker.postMessage({ tiles: tiles, subscribedEvents: ['onTileCheckedCountChanged', 'onSolutionFound'] });
-    testSolverWorker = solverWorker;
+    
+    currentTestRun = new TestRun(runNumber, counter, counterTd, solverWorker);
 }
