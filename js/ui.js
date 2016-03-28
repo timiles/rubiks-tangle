@@ -6,6 +6,7 @@ document.addEventListener("DOMContentLoaded", function(event) {
     UI = {
         TileGrid: createTileGrid(),
         Counter: document.getElementById('counter'),
+        TestAlgorithmPerformanceContainer: document.getElementById('testAlgorithmPerformanceContainer'),
         ResultsTable: document.getElementById("algorithmPerformanceResults"),
         StartTime: document.getElementById('startTime'),
         EndTime: document.getElementById('endTime'),
@@ -209,6 +210,7 @@ function onPerformanceTestMessage(evt) {
 function testAlgorithmPerformance(runNumber) {
     runNumber = runNumber || 1;
     if (runNumber == 1) {
+        UI.TestAlgorithmPerformanceContainer.style.display = '';
         setAsCurrentTime(UI.StartTime);
     }
     
