@@ -32,8 +32,31 @@
     </head>
     
     <body onload="showAvailableTiles()">
-        <h1>Rubik's Tangle solver</h1>
-    
+        <h1>Rubik's TANGLE</h1>
+        
+        <blockquote>
+            <p>
+                &ldquo;To unravel the 4 coloured ropes 25 identical tiles have to be arranged in a square so that the ropes form continuous lines.
+                The task is straightforward.  Trying is fun.  The more tiles in place the harder it gets &mdash; the complete solution is a daunting challenge.&rdquo;
+            </p>
+        </blockquote>
+
+        <p>
+            So says the intro to a puzzle that's been on my parents' shelf probably my whole life.  Every few years, usually at Christmas,
+            someone might have a go at solving it &ndash; but always to no avail.
+        </p>
+        
+        <p>
+            Curious to know how &ldquo;daunting&rdquo; this challenge really is, I took it upon myself to hammer out some JavaScript in the Chrome console
+            on an old laptop.  A couple hours later (progress slowing after lunchtime booze), we had, for the first time since the 80s,
+            a solution to the Tangle.
+        </p>
+        <p>
+            The code behind this page not only finds a solution, but also counts the number of tile comparisons required to reach this solution:
+            my algorithm averages out at over 40 million checks, but can easily take 3&times; that many, depending on the order in which we pick up the tiles.
+            If we had persevered at checking one tile per second, and did not rest till a solution was found, it would likely have taken us over a year at least.
+            Daunting, indeed!
+        </p>
         <h2>Available tiles</h2>
         
         <div id="availableTiles" class="tile-container"></div>
