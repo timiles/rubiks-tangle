@@ -174,6 +174,8 @@ function findSolution() {
         var position = getPosition(i);
         removeTile(position.x, position.y);
     }
+    // reset counter
+    counter.reset();
     
     var solverWorker = new Worker("js/solverWorker.js");
     solverWorker.onerror = logError;

@@ -14,4 +14,8 @@ var Counter = function() {
     self.getValueFormatted = function() {
         return Number(self.value).toLocaleString();
     }
+    
+    self.reset = function() {
+        self.value = 0;
+    }
 }
