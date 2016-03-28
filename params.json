@@ -1,6 +1,0 @@
-{
-  "name": "Rubik's Tangle",
-  "tagline": "JavaScript solution for 5x5 grid of Rubik's Tangle tiles.",
-  "body": "# Rubik's Tangle\r\nJavaScript solution for 5x5 grid of Rubik's Tangle tiles.\r\n\r\n# TODO\r\n- [x] display solution in UI\r\n- [x] run algorithm in background thread, updating UI\r\n- [x] add counter to track number of tile placements\r\n- [x] do multiple test runs with randomised tiles to benchmark average algorithm performance \r\n- [x] improve algorithm performance: implement \"expanding squares\" method\r\n- [ ] improve algorithm performance: detect impossible tile placements sooner?\r\n- [ ] increase browser support: only tested in Chrome so far\r\n- [ ] increase browser support: graceful degradation when HTML5 Web Workers not available\r\n\r\n# Acknowledgements\r\nImage credit for tiles: http://www.jaapsch.net/puzzles/tangle.htm\r\n",
-  "note": "Don't delete this file! It's used internally to help with page regeneration."
-}
