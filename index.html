@@ -10,12 +10,11 @@
             table {
                 border: 1px solid black;
             }
-            #availableTiles div { margin: 0 5px 5px 0; }
-            #solution {
+            #tileGrid {
                 width: 260px;
                 border-spacing: 0;
             }
-            #solution td { padding: 0; }
+            #tileGrid td { padding: 0; }
             .tile-container .tile {
                 float: left;
             }
@@ -32,32 +31,61 @@
     </head>
     
     <body onload="showAvailableTiles()">
-        <h1>Rubik's Tangle solver</h1>
-    
-        <h2>Available tiles</h2>
+        <h1>Rubik's TANGLE</h1>
         
-        <div id="availableTiles" class="tile-container"></div>
+        <blockquote>
+            <p>
+                &ldquo;To unravel the 4 coloured ropes 25 identical tiles have to be arranged in a square so that the ropes form continuous lines.
+                The task is straightforward.  Trying is fun.  The more tiles in place the harder it gets &mdash; the complete solution is a daunting challenge.&rdquo;
+            </p>
+        </blockquote>
+
+        <p>
+            So says the intro to a puzzle that's been on my parents' shelf probably my whole life.  Every few years, usually at Christmas,
+            someone might have a go at solving it &ndash; but always to no avail.
+        </p>
         
-        <button onclick="randomiseTiles()">Randomise tiles</button>
+        <p>
+            Curious to know how &ldquo;daunting&rdquo; this challenge really is, I took it upon myself to hammer out some JavaScript in the Chrome console
+            on an old laptop.  A couple hours later (progress slowing after lunchtime booze), we had, for the first time since the 80s,
+            a solution to the Tangle.
+        </p>
+        <p>
+            The code behind this page not only finds a solution, but also counts the number of tile comparisons required to reach this solution:
+            my algorithm averages out at over 40 million checks, but can easily take 3&times; that many, depending on the order in which we pick up the tiles.
+            If we had persevered at checking one tile per second, and did not rest till a solution was found, it would likely have taken us over a year at least.
+            Daunting, indeed!
+        </p>
         
-        <button onclick="findSolution()">Find solution</button>
+        <button onclick="randomiseTiles()">Shuffle tiles</button>
         
-        <table id="solution"></table>
+        <button onclick="findSolution()">Solve puzzle</button>
         
-        <p id="counter"></p>
+        <table id="tileGrid"></table>
         
-        <button onclick="testAlgorithmPerformance()">Test algorithm performance</button>
+        <p>Number of tile checks: <span id="counter">0</span></p>
         
-        <p>Start time: <span id="startTime"></span></p>
-        <table id="algorithmPerformanceResults">
-            <thead>
-                <tr>
-                    <th>Run #</th>
-                    <th>Tile checks</th>
-                </tr>
-            </thead>
-        </table>
-        <p>End time: <span id="endTime"></span></p>
+        <h2>Testing the algorithm's performance</h2>
+        
+        <p>
+            Click the button below to start ten consecutive runs of the algorithm, shuffling the order of the tiles each time.
+            (We skip showing its progress in the grid above so that all resources can be used to solve the puzzles quicker.)
+        </p>
+        
+        <button onclick="testAlgorithmPerformance()">Start performance test</button>
+        
+        <div id="testAlgorithmPerformanceContainer" style="display: none">
+            <p>Start time: <span id="startTime"></span></p>
+            <table id="algorithmPerformanceResults">
+                <thead>
+                    <tr>
+                        <th>Run #</th>
+                        <th>Tile checks</th>
+                    </tr>
+                </thead>
+            </table>
+            <p>End time: <span id="endTime"></span></p>
+        </div>
     </body>
 
 </html>
