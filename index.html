@@ -10,12 +10,11 @@
             table {
                 border: 1px solid black;
             }
-            #availableTiles div { margin: 0 5px 5px 0; }
-            #solution {
+            #tileGrid {
                 width: 260px;
                 border-spacing: 0;
             }
-            #solution td { padding: 0; }
+            #tileGrid td { padding: 0; }
             .tile-container .tile {
                 float: left;
             }
@@ -57,17 +56,14 @@
             If we had persevered at checking one tile per second, and did not rest till a solution was found, it would likely have taken us over a year at least.
             Daunting, indeed!
         </p>
-        <h2>Available tiles</h2>
         
-        <div id="availableTiles" class="tile-container"></div>
+        <button onclick="randomiseTiles()">Shuffle tiles</button>
         
-        <button onclick="randomiseTiles()">Randomise tiles</button>
+        <button onclick="findSolution()">Solve puzzle</button>
         
-        <button onclick="findSolution()">Find solution</button>
+        <table id="tileGrid"></table>
         
-        <table id="solution"></table>
-        
-        <p id="counter"></p>
+        <p>Number of tile checks: <span id="counter">0</span></p>
         
         <button onclick="testAlgorithmPerformance()">Test algorithm performance</button>
         

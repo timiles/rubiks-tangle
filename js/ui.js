@@ -4,7 +4,6 @@ if (!window.Worker) { alert('Please use a modern browser which supports HTML5 We
 // UI Elements
 document.addEventListener("DOMContentLoaded", function(event) {
     UI = {
-        AvailableTilesContainer: document.getElementById('availableTiles'), 
         TileGrid: createTileGrid(),
         Counter: document.getElementById('counter'),
         ResultsTable: document.getElementById("algorithmPerformanceResults"),
@@ -31,7 +30,7 @@ document.addEventListener("DOMContentLoaded", function(event) {
     
     function createTileGrid() {
         var tileGrid = new Array();
-        var solutionTable = document.getElementById('solution');
+        var tileGridTable = document.getElementById('tileGrid');
         for (var y = 0; y < 5; y++) {
             var tr = document.createElement('tr');
             var tiles = new Array();
@@ -42,7 +41,7 @@ document.addEventListener("DOMContentLoaded", function(event) {
                 tiles.push(tileDiv);
                 tr.appendChild(td);
             }
-            solutionTable.appendChild(tr);
+            tileGridTable.appendChild(tr);
             tileGrid.push(tiles);
         }
         return tileGrid;
@@ -113,13 +112,19 @@ function createTileDiv(tileDefinition) {
 }
 
 function showAvailableTiles() {
-    while (UI.AvailableTilesContainer.childNodes.length > 0) {
-        UI.AvailableTilesContainer.removeChild(UI.AvailableTilesContainer.childNodes[0]);
-    }
-    
     for (var i = 0; i < tiles.length; i++) {
-        UI.AvailableTilesContainer.appendChild(createTileDiv(tiles[i]));
+        var position = getPosition(i);
+        // do a random rotation just for display purposes
+        var rotation = Math.floor(4 * Math.random());
+        placeTile(position.x, position.y, tiles[i], rotation);
     }
+}
+
+function getPosition(index) {
+    return {
+        x: index % 5,
+        y: Math.floor(index / 5)
+    };
 }
 
 function randomiseTiles() {
@@ -162,7 +167,13 @@ function onSolverWorkerMessage(evt) {
     }
 }
 
-function findSolution() {    
+function findSolution() {
+    // clear grid
+    for (var i = 0; i < tiles.length; i++) {
+        var position = getPosition(i);
+        removeTile(position.x, position.y);
+    }
+    
     var solverWorker = new Worker("js/solverWorker.js");
     solverWorker.onerror = logError;
     solverWorker.onmessage = onSolverWorkerMessage; 
