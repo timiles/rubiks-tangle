@@ -26,7 +26,23 @@ document.addEventListener("DOMContentLoaded", function(event) {
             tr.appendChild(counterTd);
             UI.ResultsTable.appendChild(tr);
     
-        }       
+        },
+        addFooter: function(average) { 
+
+            var runTd = document.createElement('td');
+            runTd.innerText = 'AVERAGE';
+            
+            var averageTd = document.createElement('td');
+            averageTd.innerText = Number(average).toLocaleString();
+            
+            var tr = document.createElement('tr');
+            tr.appendChild(runTd);
+            tr.appendChild(averageTd);
+
+            var tfoot = document.createElement('tfoot');
+            tfoot.appendChild(tr);
+            UI.ResultsTable.appendChild(tfoot);            
+        }
     };
     
     function createTileGrid() {
@@ -188,7 +204,17 @@ function setAsCurrentTime(el) {
     el.innerText = new Date().toLocaleTimeString();
 }
 
+var testRuns = new Array();
 var currentTestRun;
+
+function getAverageOfTestRuns() {
+    var sum = 0;
+    for (var i = 0; i < testRuns.length; i++) {
+        sum += testRuns[i].counter.value;
+    }
+    var average = sum / testRuns.length;
+    return Math.round(average);
+}
 
 function onPerformanceTestMessage(evt) {
     switch (evt.data.event) {
@@ -203,6 +229,7 @@ function onPerformanceTestMessage(evt) {
             }
             else {
                 setAsCurrentTime(UI.EndTime);
+                UI.addFooter(getAverageOfTestRuns());
             }
             return;
         }
@@ -224,6 +251,7 @@ function testAlgorithmPerformance(runNumber) {
 
     currentTestRun = new TestRun(runNumber, new Counter(), solverWorker);
     UI.addTestRun(currentTestRun);
+    testRuns.push(currentTestRun);
 
     solverWorker.postMessage({ tiles: tiles, subscribedEvents: ['onTileCheckedCountChanged', 'onSolutionFound'] });    
 }
