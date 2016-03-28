@@ -1,7 +1,7 @@
 # Rubik's Tangle
 JavaScript solution for 5x5 grid of Rubik's Tangle tiles.
 
-[Click here](http://timiles.github.com/rubiks-tangle/) to see the script in action.
+[Click here](http://timiles.github.io/rubiks-tangle/) to see the script in action.
 
 # TODO
 - [x] display solution in UI
