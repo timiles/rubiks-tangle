@@ -46,9 +46,17 @@
                 height: 52px;
             }
         </style>
+        <script type="text/javascript">
+
+            document.addEventListener("DOMContentLoaded", function(event) {
+                var ui = new UI(document);
+                Controller = new Controller(ui);
+            });
+
+        </script>
     </head>
     
-    <body onload="showAvailableTiles()">
+    <body>
         <h1>Rubik's TANGLE</h1>
         
         <blockquote>
@@ -79,9 +87,9 @@
         
         <h2>The solution</h2>
         
-        <button onclick="randomiseTiles()">Shuffle tiles</button>
+        <button onclick="Controller.randomiseTiles()">Shuffle tiles</button>
         
-        <button onclick="findSolution()">Solve puzzle</button>
+        <button onclick="Controller.findSolution()">Solve puzzle</button>
         
         <table id="tileGrid"></table>
         
@@ -94,7 +102,7 @@
             (We skip showing its progress in the grid above so that all resources can be used to solve the puzzles quicker.)
         </p>
         
-        <button onclick="testAlgorithmPerformance()">Start performance test</button>
+        <button onclick="Controller.testAlgorithmPerformance()">Start performance test</button>
         
         <div id="testAlgorithmPerformanceContainer">
             <p>Start time: <span id="startTime"></span></p>

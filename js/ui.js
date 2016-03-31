@@ -1,9 +1,3 @@
-
-// UI Elements
-document.addEventListener("DOMContentLoaded", function(event) {
-   UI = new UI(document);
-});
-
 var UI = function(dom) {
     var self = this;
 
@@ -16,63 +10,63 @@ var UI = function(dom) {
     self.EndTime = dom.getElementById('endTime');
     
     self.placeTile = function(x, y, definition, rotation) {
-        UI.TileGrid[y][x].style.backgroundImage = 'url(img/' + definition + '.png)';
-        UI.TileGrid[y][x].style.transform = getTransformStyleForRotation(rotation);
+        self.TileGrid[y][x].style.backgroundImage = 'url(img/' + definition + '.png)';
+        self.TileGrid[y][x].style.transform = getTransformStyleForRotation(rotation);
     };
 
     self.removeTile = function(x, y) {
-        UI.TileGrid[y][x].style.backgroundImage = '';
+        self.TileGrid[y][x].style.backgroundImage = '';
     };
 
     self.setStartTime = function() {
-        setAsCurrentTime(UI.StartTime);
+        setAsCurrentTime(self.StartTime);
     };
     
     self.setEndTime = function() {
-        setAsCurrentTime(UI.EndTime);
+        setAsCurrentTime(self.EndTime);
     };
     
     self.addTestRun = function(testRun) {
         
-        var tr = document.createElement('tr');
-        var runTd = document.createElement('td');
+        var tr = dom.createElement('tr');
+        var runTd = dom.createElement('td');
         runTd.innerText = testRun.runNumber.toString();
         
-        var counterTd = document.createElement('td');
+        var counterTd = dom.createElement('td');
         testRun.counter.onValueChanged = function() {
             counterTd.innerText = this.getValueFormatted();
         }
         
         tr.appendChild(runTd);
         tr.appendChild(counterTd);
-        UI.ResultsTable.appendChild(tr);
+        self.ResultsTable.appendChild(tr);
 
     };
     self.addFooter = function(average) { 
 
-        var runTd = document.createElement('td');
+        var runTd = dom.createElement('td');
         runTd.innerText = 'AVERAGE';
         
-        var averageTd = document.createElement('td');
+        var averageTd = dom.createElement('td');
         averageTd.innerText = Number(average).toLocaleString();
         
-        var tr = document.createElement('tr');
+        var tr = dom.createElement('tr');
         tr.appendChild(runTd);
         tr.appendChild(averageTd);
 
-        var tfoot = document.createElement('tfoot');
+        var tfoot = dom.createElement('tfoot');
         tfoot.appendChild(tr);
-        UI.ResultsTable.appendChild(tfoot);            
+        self.ResultsTable.appendChild(tfoot);            
     };
 
     function createTileGrid() {
         var tileGrid = new Array();
-        var tileGridTable = document.getElementById('tileGrid');
+        var tileGridTable = dom.getElementById('tileGrid');
         for (var y = 0; y < 5; y++) {
-            var tr = document.createElement('tr');
+            var tr = dom.createElement('tr');
             var tiles = new Array();
             for (var x = 0; x < 5; x++) {
-                var td = document.createElement('td');
+                var td = dom.createElement('td');
                 var tileDiv = createTileDiv();
                 td.appendChild(tileDiv);
                 tiles.push(tileDiv);
@@ -94,7 +88,7 @@ var UI = function(dom) {
     }
 
     function createTileDiv(tileDefinition) {
-        var tileDiv = document.createElement('div');
+        var tileDiv = dom.createElement('div');
         tileDiv.className = 'tile';
         if (tileDefinition) {
             tileDiv.style.backgroundImage = 'url(img/' + tileDefinition + '.png)';
