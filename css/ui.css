@@ -1,0 +1,18 @@
+#tileGrid {
+    border: 1px solid black;
+    width: 260px;
+    border-spacing: 0;
+}
+#tileGrid td { padding: 0; }
+.tile-container .tile {
+    float: left;
+}
+.tile-container:after {
+    content: '';
+    display: block;
+    clear: both;
+}
+.tile {
+    width: 52px;
+    height: 52px;
+}
