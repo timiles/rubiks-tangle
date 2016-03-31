@@ -41,10 +41,11 @@ var Controller = function(UI) {
         solverWorker.onerror = logError;
         solverWorker.onmessage = onPerformanceTestMessage; 
 
-        self.currentTestRun = new TestRun(runNumber, new Counter(), solverWorker);
-        UI.addTestRun(self.currentTestRun);
-        self.testRuns.push(self.currentTestRun);
-
+        var testRun = new TestRun(runNumber, new Counter(), solverWorker);
+        UI.addTestRun(testRun);
+        self.testRuns.push(testRun);
+        self.currentTestRun = testRun; 
+        
         solverWorker.postMessage({ tiles: self.tiles, subscribedEvents: ['onTileCheckedCountChanged', 'onSolutionFound'] });    
     }
 
@@ -82,6 +83,13 @@ var Controller = function(UI) {
             var rotation = Math.floor(4 * Math.random());
             UI.placeTile(position.x, position.y, self.tiles[i], rotation);
         }
+    }
+
+    function getPosition(index) {
+        return {
+            x: index % 5,
+            y: Math.floor(index / 5)
+        };
     }
     
     function getAverageOfTestRuns(testRuns) {
@@ -129,39 +137,31 @@ var Controller = function(UI) {
             }
         }
     }
-   
-};
+    
+    // utils
+    // REF: http://stackoverflow.com/a/2450976/487544
+    function shuffle(array) {
+        var currentIndex = array.length, temporaryValue, randomIndex;
 
+        // While there remain elements to shuffle...
+        while (0 !== currentIndex) {
 
-// utils
-// REF: http://stackoverflow.com/a/2450976/487544
-function shuffle(array) {
-    var currentIndex = array.length, temporaryValue, randomIndex;
+            // Pick a remaining element...
+            randomIndex = Math.floor(Math.random() * currentIndex);
+            currentIndex -= 1;
 
-    // While there remain elements to shuffle...
-    while (0 !== currentIndex) {
+            // And swap it with the current element.
+            temporaryValue = array[currentIndex];
+            array[currentIndex] = array[randomIndex];
+            array[randomIndex] = temporaryValue;
+        }
 
-        // Pick a remaining element...
-        randomIndex = Math.floor(Math.random() * currentIndex);
-        currentIndex -= 1;
-
-        // And swap it with the current element.
-        temporaryValue = array[currentIndex];
-        array[currentIndex] = array[randomIndex];
-        array[randomIndex] = temporaryValue;
+        return array;
     }
 
-    return array;
-}
-
-function logError(e) {
-    alert(e.message + ' -- ' + e.filename + ': line ' + e.lineno);
-    console.error(e);
-}
-
-function getPosition(index) {
-    return {
-        x: index % 5,
-        y: Math.floor(index / 5)
-    };
-}
+    function logError(e) {
+        alert(e.message + ' -- ' + e.filename + ': line ' + e.lineno);
+        console.error(e);
+    }
+   
+};
