@@ -30,22 +30,22 @@ var UI = function(dom) {
         setAsCurrentTime(self.EndTime);
     };
     
-    self.addTestRun = function(testRun) {
+    self.addTestRun = function(runNumber, counter) {
         
         var tr = dom.createElement('tr');
         var runTd = dom.createElement('td');
-        runTd.innerText = testRun.runNumber.toString();
+        runTd.innerText = runNumber.toString();
         
         var counterTd = dom.createElement('td');
-        testRun.counter.onValueChanged = function() {
+        counter.onValueChanged = function() {
             counterTd.innerText = this.getValueFormatted();
         }
         
         tr.appendChild(runTd);
         tr.appendChild(counterTd);
         self.ResultsTable.appendChild(tr);
-
     };
+    
     self.addFooter = function(average) { 
 
         var runTd = dom.createElement('td');

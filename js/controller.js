@@ -15,16 +15,11 @@ var Controller = function(ui) {
     }
     
     // initialise properties
-    self.counter = new Counter();
     self.tiles = createTiles();
-    self.testRuns = new Array();
-    self.currentTestRun = undefined;
+    self.testRunCounters = new Array();
     
     // methods
     self.init = function() {
-        self.counter.onValueChanged = function() {
-            ui.Counter.innerText = this.getValueFormatted();
-        };
         self.showAvailableTiles();
     }
     
@@ -48,15 +43,19 @@ var Controller = function(ui) {
             var position = getPosition(i);
             ui.removeTile(position.x, position.y);
         }
+
         // reset counter
-        self.counter.reset();
-        
+        var counter = new Counter();
+        counter.onValueChanged = function() {
+            ui.Counter.innerText = this.getValueFormatted();
+        };
+
         var solverWorker = new Worker("js/solverWorker.js");
         solverWorker.onerror = logError;
         solverWorker.onmessage = function(evt) {
             switch (evt.data.event) {
                 case 'onTileCheckedCountChanged': {
-                    self.counter.increment(evt.data.amount);
+                    counter.increment(evt.data.amount);
                     return;
                 }
                 case 'onTilePlaced': {
@@ -65,6 +64,10 @@ var Controller = function(ui) {
                 }
                 case 'onTileRemoved': {
                     ui.removeTile(evt.data.position.x, evt.data.position.y);
+                    return;
+                }
+                case 'onSolutionFound': {
+                    solverWorker.terminate();
                     return;
                 }
             }
@@ -81,35 +84,33 @@ var Controller = function(ui) {
         }
         
         self.randomiseTiles();
+
+        var counter = new Counter();
+        ui.addTestRun(runNumber, counter);
+        self.testRunCounters.push(counter);
         
         var solverWorker = new Worker("js/solverWorker.js");
         solverWorker.onerror = logError;
         solverWorker.onmessage = function(evt) {
             switch (evt.data.event) {
                 case 'onTileCheckedCountChanged': {
-                    self.currentTestRun.counter.increment(evt.data.amount);
+                    counter.increment(evt.data.amount);
                     return;
                 }
                 case 'onSolutionFound': {
-                    debugger;
-                    self.currentTestRun.solverWorker.terminate();
-                    if (self.currentTestRun.runNumber < 10) {
-                        self.testAlgorithmPerformance(self.currentTestRun.runNumber + 1);
+                    solverWorker.terminate();
+                    if (runNumber < 10) {
+                        self.testAlgorithmPerformance(runNumber + 1);
                     }
                     else {
                         ui.setEndTime();
-                        ui.addFooter(getAverageOfTestRuns(self.testRuns));
+                        ui.addFooter(getAverageOfTestRuns(self.testRunCounters));
                     }
                     return;
                 }
             }
         }; 
 
-        var testRun = new TestRun(runNumber, new Counter(), solverWorker);
-        ui.addTestRun(testRun);
-        self.testRuns.push(testRun);
-        self.currentTestRun = testRun; 
-        
         solverWorker.postMessage({ tiles: self.tiles, subscribedEvents: ['onTileCheckedCountChanged', 'onSolutionFound'] });    
     }
 
@@ -145,7 +146,7 @@ var Controller = function(ui) {
     function getAverageOfTestRuns(testRuns) {
         var sum = 0;
         for (var i = 0; i < testRuns.length; i++) {
-            sum += testRuns[i].counter.value;
+            sum += testRuns[i].value;
         }
         var average = sum / testRuns.length;
         return Math.round(average);
