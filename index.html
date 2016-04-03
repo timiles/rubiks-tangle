@@ -15,7 +15,7 @@
 
             document.addEventListener("DOMContentLoaded", function(event) {
                 var ui = new UI(document);
-                Controller = new Controller(ui);
+                new Controller(ui);
             });
 
         </script>
@@ -55,8 +55,8 @@
         <table id="tileGrid"></table>
 
         <div class="button-container">        
-            <button onclick="Controller.randomiseTiles()">Shuffle tiles</button>
-            <button onclick="Controller.findSolution()">Solve puzzle</button>
+            <button id="btnShuffle">Shuffle tiles</button>
+            <button id="btnSolve">Solve puzzle</button>
         </div>
                 
         <p>Number of tile checks: <span id="counter">0</span></p>
@@ -68,7 +68,7 @@
             (We skip showing its progress in the grid above so that all resources can be used to solve the puzzles quicker.)
         </p>
         
-        <button onclick="Controller.testAlgorithmPerformance()">Start performance test</button>
+        <button id="btnStartPerformanceTest">Start performance test</button>
         
         <div id="testAlgorithmPerformanceContainer">
             <p>Start time: <span id="startTime"></span></p>

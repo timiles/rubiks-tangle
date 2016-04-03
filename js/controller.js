@@ -1,63 +1,122 @@
 if (!window.Worker) { alert('Please use a modern browser which supports HTML5 Web Workers'); } 
 
-var Controller = function(UI) {
+var Controller = function(ui) {
     var self = this;
+        
+    // ui actions
+    ui.btnShuffle.onclick = function() {
+        self.randomiseTiles();
+    }
+    ui.btnSolve.onclick = function() {
+        self.findSolution();
+    }; 
+    ui.btnStartPerformanceTest.onclick = function() {
+        self.testAlgorithmPerformance(1);
+    }
     
+    // initialise properties
     self.counter = new Counter();
     self.tiles = createTiles();
     self.testRuns = new Array();
     self.currentTestRun = undefined;
-
+    
+    // methods
+    self.init = function() {
+        self.counter.onValueChanged = function() {
+            ui.Counter.innerText = this.getValueFormatted();
+        };
+        self.showAvailableTiles();
+    }
+    
     self.randomiseTiles = function() {
         shuffle(self.tiles);
-        showAvailableTiles();    
+        self.showAvailableTiles();
     };
+    
+    self.showAvailableTiles = function() {
+        for (var i = 0; i < self.tiles.length; i++) {
+            var position = getPosition(i);
+            // do a random rotation just for display purposes
+            var rotation = Math.floor(4 * Math.random());
+            ui.placeTile(position.x, position.y, self.tiles[i], rotation);
+        }
+    }
     
     self.findSolution = function() {
         // clear grid
         for (var i = 0; i < self.tiles.length; i++) {
             var position = getPosition(i);
-            UI.removeTile(position.x, position.y);
+            ui.removeTile(position.x, position.y);
         }
         // reset counter
         self.counter.reset();
         
         var solverWorker = new Worker("js/solverWorker.js");
         solverWorker.onerror = logError;
-        solverWorker.onmessage = onSolverWorkerMessage; 
+        solverWorker.onmessage = function(evt) {
+            switch (evt.data.event) {
+                case 'onTileCheckedCountChanged': {
+                    self.counter.increment(evt.data.amount);
+                    return;
+                }
+                case 'onTilePlaced': {
+                    ui.placeTile(evt.data.position.x, evt.data.position.y, evt.data.tile.definition, evt.data.tile.rotation);
+                    return;
+                }
+                case 'onTileRemoved': {
+                    ui.removeTile(evt.data.position.x, evt.data.position.y);
+                    return;
+                }
+            }
+        };
+        
+        // start worker 
         solverWorker.postMessage({ tiles: self.tiles });
     };
     
     self.testAlgorithmPerformance = function(runNumber) {
-        runNumber = runNumber || 1;
         if (runNumber == 1) {
-            UI.TestAlgorithmPerformanceContainer.style.display = '';
-            UI.setStartTime();
+            ui.TestAlgorithmPerformanceContainer.style.display = '';
+            ui.setStartTime();
         }
         
         self.randomiseTiles();
         
         var solverWorker = new Worker("js/solverWorker.js");
         solverWorker.onerror = logError;
-        solverWorker.onmessage = onPerformanceTestMessage; 
+        solverWorker.onmessage = function(evt) {
+            switch (evt.data.event) {
+                case 'onTileCheckedCountChanged': {
+                    self.currentTestRun.counter.increment(evt.data.amount);
+                    return;
+                }
+                case 'onSolutionFound': {
+                    debugger;
+                    self.currentTestRun.solverWorker.terminate();
+                    if (self.currentTestRun.runNumber < 10) {
+                        self.testAlgorithmPerformance(self.currentTestRun.runNumber + 1);
+                    }
+                    else {
+                        ui.setEndTime();
+                        ui.addFooter(getAverageOfTestRuns(self.testRuns));
+                    }
+                    return;
+                }
+            }
+        }; 
 
         var testRun = new TestRun(runNumber, new Counter(), solverWorker);
-        UI.addTestRun(testRun);
+        ui.addTestRun(testRun);
         self.testRuns.push(testRun);
         self.currentTestRun = testRun; 
         
         solverWorker.postMessage({ tiles: self.tiles, subscribedEvents: ['onTileCheckedCountChanged', 'onSolutionFound'] });    
     }
 
-    init();
-    
-    function init() {
-        self.counter.onValueChanged = function() {
-            UI.Counter.innerText = this.getValueFormatted();
-        };
-        showAvailableTiles();
-    }
-    
+    // run init    
+    self.init();
+
+    // static helpers    
     function createTiles() {
         var tiles = new Array();
         var colours = ['b', 'g', 'r', 'y'];
@@ -75,16 +134,7 @@ var Controller = function(UI) {
         tiles.push('ygrb');
         return tiles;
     }
-
-    function showAvailableTiles() {
-        for (var i = 0; i < self.tiles.length; i++) {
-            var position = getPosition(i);
-            // do a random rotation just for display purposes
-            var rotation = Math.floor(4 * Math.random());
-            UI.placeTile(position.x, position.y, self.tiles[i], rotation);
-        }
-    }
-
+    
     function getPosition(index) {
         return {
             x: index % 5,
@@ -99,43 +149,6 @@ var Controller = function(UI) {
         }
         var average = sum / testRuns.length;
         return Math.round(average);
-    }
-
-    function onSolverWorkerMessage(evt) {
-        switch (evt.data.event) {
-            case 'onTileCheckedCountChanged': {
-                self.counter.increment(evt.data.amount);
-                return;
-            }
-            case 'onTilePlaced': {
-                UI.placeTile(evt.data.position.x, evt.data.position.y, evt.data.tile.definition, evt.data.tile.rotation);
-                return;
-            }
-            case 'onTileRemoved': {
-                UI.removeTile(evt.data.position.x, evt.data.position.y);
-                return;
-            }
-        }
-    }
-
-    function onPerformanceTestMessage(evt) {
-        switch (evt.data.event) {
-            case 'onTileCheckedCountChanged': {
-                self.currentTestRun.counter.increment(evt.data.amount);
-                return;
-            }
-            case 'onSolutionFound': {
-                self.currentTestRun.solverWorker.terminate();
-                if (self.currentTestRun.runNumber < 10) {
-                    self.testAlgorithmPerformance(self.currentTestRun.runNumber + 1);
-                }
-                else {
-                    UI.setEndTime();
-                    UI.addFooter(getAverageOfTestRuns(self.testRuns));
-                }
-                return;
-            }
-        }
     }
     
     // utils

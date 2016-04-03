@@ -9,6 +9,10 @@ var UI = function(dom) {
     self.StartTime = dom.getElementById('startTime');
     self.EndTime = dom.getElementById('endTime');
     
+    self.btnShuffle = dom.getElementById('btnShuffle');
+    self.btnSolve = dom.getElementById('btnSolve');
+    self.btnStartPerformanceTest = dom.getElementById('btnStartPerformanceTest');
+    
     self.placeTile = function(x, y, definition, rotation) {
         self.TileGrid[y][x].style.backgroundImage = 'url(img/' + definition + '.png)';
         self.TileGrid[y][x].style.transform = getTransformStyleForRotation(rotation);
