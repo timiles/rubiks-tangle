@@ -1,5 +1,8 @@
 var Solver = function(tiles, onTileChecked, onTilePlaced, onTileRemoved) {
     var self = this;
+    
+    const totalTiles = tiles.length;
+    const gridSize = Math.sqrt(tiles.length);
 
     var Tile = function(definition) {
         var self = this;
@@ -33,21 +36,30 @@ var Solver = function(tiles, onTileChecked, onTilePlaced, onTileRemoved) {
     };
 
     self.tiles = tiles.map(function(definition) { return new Tile(definition); });
-    self.placedTiles = new Array(25);
+    self.placedTiles = new Array(totalTiles);
     
-    var indexSequence = [12, 17, 16, 11, 6, 7, 8, 13, 18, 23, 22, 21, 20, 15, 10, 5, 0, 1, 2, 3, 4, 9, 14, 19, 24];
+    var indexSequence = createSpiralIndexSequence(gridSize);
     
     function getPosition(index) {
         return {
-            x: index % 5,
-            y: Math.floor(index / 5)
+            x: index % gridSize,
+            y: Math.floor(index / gridSize)
         };
     }
     
     function getGridNumber(position) {
-        if (position.x < 0 || position.x > 4) return -1;
-        if (position.y < 0 || position.y > 4) return -1;
-        return (5 * position.y) + position.x;
+        if (position.x < 0 || position.x >= gridSize) return -1;
+        if (position.y < 0 || position.y >= gridSize) return -1;
+        return (gridSize * position.y) + position.x;
+    }
+    
+    function createSpiralIndexSequence(gridSize) {
+        switch (gridSize) {
+            case 5:
+                return [12, 17, 16, 11, 6, 7, 8, 13, 18, 23, 22, 21, 20, 15, 10, 5, 0, 1, 2, 3, 4, 9, 14, 19, 24];
+            default:
+                throw 'Not implemented: createSpiralIndexSequence for gridSize ' + gridSize;
+        }
     }
 
     self.getTileIfExists = function(position) {
@@ -94,7 +106,7 @@ var Solver = function(tiles, onTileChecked, onTilePlaced, onTileRemoved) {
     const DEADEND = 'DEADEND';
     
     self.placeNextTile = function(availableTiles) {
-        var sequenceNumber = 25 - availableTiles.length;
+        var sequenceNumber = totalTiles - availableTiles.length;
         var position = getPosition(indexSequence[sequenceNumber]);
         var triedTiles = new Array();
 
@@ -131,7 +143,7 @@ var Solver = function(tiles, onTileChecked, onTilePlaced, onTileRemoved) {
             triedTiles.push(tile);
         }
 
-        // if we ran out of tiles, we dun goofed. return undefined;
+        // if we ran out of tiles, we dun goofed.
         return DEADEND;
     }
     
