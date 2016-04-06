@@ -3,6 +3,15 @@ body {
     max-width: 600px;
     margin: auto;
 }
+
+.info {
+    border: 1px solid;
+    margin: 10px 0px;
+    padding: 0 10px;
+    color: #00529B;
+    background-color: #BDE5F8;
+}
+
 #algorithmPerformanceResults {
     text-align: center;
     border: 1px solid black;
