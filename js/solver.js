@@ -91,6 +91,8 @@ var Solver = function(tiles, onTileChecked, onTilePlaced, onTileRemoved) {
         return true;
     }
     
+    const DEADEND = 'DEADEND';
+    
     self.placeNextTile = function(availableTiles) {
         var sequenceNumber = 25 - availableTiles.length;
         var position = getPosition(indexSequence[sequenceNumber]);
@@ -114,15 +116,13 @@ var Solver = function(tiles, onTileChecked, onTilePlaced, onTileRemoved) {
                         return self.placedTiles;
                     }
 
-                    try {
-                        return self.placeNextTile(remainingTiles);
+                    var solution = self.placeNextTile(remainingTiles);
+                    if (solution !== DEADEND) {
+                        return solution;
                     }
-                    catch (e) {
-                        if (e == 'Deadend') {
-                            self.placedTiles[gridNumber] = undefined;
-                            onTileRemoved(position);
-                        }
-                        else { throw e; }
+                    else {
+                        self.placedTiles[gridNumber] = undefined;
+                        onTileRemoved(position);
                     }
 
                 }
@@ -131,8 +131,8 @@ var Solver = function(tiles, onTileChecked, onTilePlaced, onTileRemoved) {
             triedTiles.push(tile);
         }
 
-        // if we ran out of tiles, we dun goofed. throw up;
-        throw 'Deadend';
+        // if we ran out of tiles, we dun goofed. return undefined;
+        return DEADEND;
     }
     
     self.solve = function() {
