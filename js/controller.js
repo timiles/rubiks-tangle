@@ -45,10 +45,10 @@ var Controller = function(ui) {
         }
 
         // reset counter
-        var counter = new Counter();
-        counter.onValueChanged = function() {
-            ui.Counter.innerText = this.getValueFormatted();
-        };
+        var counter = Counter();
+        counter.addOnValueChangedListener(function() {
+            ui.Counter.innerText = counter.getValueFormatted();
+        });
 
         var solverWorker = new Worker("js/solverWorker.js");
         solverWorker.onerror = logError;
@@ -85,7 +85,7 @@ var Controller = function(ui) {
         
         self.randomiseTiles();
 
-        var counter = new Counter();
+        var counter = Counter();
         ui.addTestRun(runNumber, counter);
         self.testRunCounters.push(counter);
         

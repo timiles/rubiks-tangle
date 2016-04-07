@@ -37,9 +37,9 @@ var UI = function(dom) {
         runTd.innerText = runNumber.toString();
         
         var counterTd = dom.createElement('td');
-        counter.onValueChanged = function() {
-            counterTd.innerText = this.getValueFormatted();
-        }
+        counter.addOnValueChangedListener(function() {
+            counterTd.innerText = counter.getValueFormatted();
+        });
         
         tr.appendChild(runTd);
         tr.appendChild(counterTd);

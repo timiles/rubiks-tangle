@@ -1,21 +1,22 @@
 var Counter = function() {
-    var self = this;
+    // private variables
+    var value = 0;
+    var onValueChangedListeners = [];
     
-    self.value = 0;
-    self.onValueChanged;
-    
-    self.increment = function(amount) {
-        self.value += amount;
-        if (self.onValueChanged) {
-            self.onValueChanged();
+    // public methods
+    return {
+        addOnValueChangedListener: function(listener) {
+            onValueChangedListeners.push(listener);
+        },
+        getValueFormatted: function() {
+            return Number(value).toLocaleString();
+        },
+        increment: function(amount) {
+            value += amount || 1;
+            onValueChangedListeners.forEach(function(listener) { listener(value); });
+        },        
+        reset: function() {
+            value = 0;
         }
-    }
-    
-    self.getValueFormatted = function() {
-        return Number(self.value).toLocaleString();
-    }
-    
-    self.reset = function() {
-        self.value = 0;
-    }
-}
+    };
+};
