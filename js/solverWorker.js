@@ -1,3 +1,4 @@
+importScripts('utils.js');
 importScripts('solver.js');
 
 onmessage = OnCreatorMessage; 

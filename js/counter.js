@@ -8,9 +8,6 @@ var Counter = function() {
         addOnValueChangedListener: function(listener) {
             onValueChangedListeners.push(listener);
         },
-        getValueFormatted: function() {
-            return Number(value).toLocaleString();
-        },
         increment: function(amount) {
             value += amount || 1;
             onValueChangedListeners.forEach(function(listener) { listener(value); });

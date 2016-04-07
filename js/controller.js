@@ -24,7 +24,7 @@ var Controller = function(ui) {
     }
     
     self.randomiseTiles = function() {
-        shuffle(self.tiles);
+        self.tiles.shuffle();
         self.showAvailableTiles();
     };
     
@@ -46,12 +46,12 @@ var Controller = function(ui) {
 
         // reset counter
         var counter = Counter();
-        counter.addOnValueChangedListener(function() {
-            ui.Counter.innerText = counter.getValueFormatted();
+        counter.addOnValueChangedListener(function(val) {
+            ui.Counter.innerText = Utils.formatNumber(val);
         });
 
         var solverWorker = new Worker("js/solverWorker.js");
-        solverWorker.onerror = logError;
+        solverWorker.onerror = Utils.logError;
         solverWorker.onmessage = function(evt) {
             switch (evt.data.event) {
                 case 'onTileCheckedCountChanged': {
@@ -90,7 +90,7 @@ var Controller = function(ui) {
         self.testRunCounters.push(counter);
         
         var solverWorker = new Worker("js/solverWorker.js");
-        solverWorker.onerror = logError;
+        solverWorker.onerror = Utils.logError;
         solverWorker.onmessage = function(evt) {
             switch (evt.data.event) {
                 case 'onTileCheckedCountChanged': {
@@ -122,10 +122,10 @@ var Controller = function(ui) {
         var tiles = new Array();
         var colours = ['b', 'g', 'r', 'y'];
 
-        for (var a in colours)
-        for (var b in colours)
-        for (var c in colours)
-        for (var d in colours) {
+        for (var a = 0; a < colours.length; a++)
+        for (var b = 0; b < colours.length; b++)
+        for (var c = 0; c < colours.length; c++)
+        for (var d = 0; d < colours.length; d++) {
             if (a == b || a == c || a == d || b == c || b == d || c == d) {
                 continue;
             }
@@ -151,31 +151,4 @@ var Controller = function(ui) {
         var average = sum / testRuns.length;
         return Math.round(average);
     }
-    
-    // utils
-    // REF: http://stackoverflow.com/a/2450976/487544
-    function shuffle(array) {
-        var currentIndex = array.length, temporaryValue, randomIndex;
-
-        // While there remain elements to shuffle...
-        while (0 !== currentIndex) {
-
-            // Pick a remaining element...
-            randomIndex = Math.floor(Math.random() * currentIndex);
-            currentIndex -= 1;
-
-            // And swap it with the current element.
-            temporaryValue = array[currentIndex];
-            array[currentIndex] = array[randomIndex];
-            array[randomIndex] = temporaryValue;
-        }
-
-        return array;
-    }
-
-    function logError(e) {
-        alert(e.message + ' -- ' + e.filename + ': line ' + e.lineno);
-        console.error(e);
-    }
-   
 };

@@ -37,8 +37,8 @@ var UI = function(dom) {
         runTd.innerText = runNumber.toString();
         
         var counterTd = dom.createElement('td');
-        counter.addOnValueChangedListener(function() {
-            counterTd.innerText = counter.getValueFormatted();
+        counter.addOnValueChangedListener(function(val) {
+            counterTd.innerText = Utils.formatNumber(val);
         });
         
         tr.appendChild(runTd);
@@ -52,7 +52,7 @@ var UI = function(dom) {
         runTd.innerText = 'AVERAGE';
         
         var averageTd = dom.createElement('td');
-        averageTd.innerText = Number(average).toLocaleString();
+        averageTd.innerText = Utils.formatNumber(average);
         
         var tr = dom.createElement('tr');
         tr.appendChild(runTd);
