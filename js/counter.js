@@ -8,6 +8,9 @@ var Counter = function() {
         addOnValueChangedListener: function(listener) {
             onValueChangedListeners.push(listener);
         },
+        getValue: function() {
+            return value;
+        },
         increment: function(amount) {
             value += amount || 1;
             onValueChangedListeners.forEach(function(listener) { listener(value); });

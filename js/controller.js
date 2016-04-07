@@ -146,7 +146,7 @@ var Controller = function(ui) {
     function getAverageOfTestRuns(testRuns) {
         var sum = 0;
         for (var i = 0; i < testRuns.length; i++) {
-            sum += testRuns[i].value;
+            sum += testRuns[i].getValue();
         }
         var average = sum / testRuns.length;
         return Math.round(average);
