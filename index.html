@@ -15,7 +15,16 @@
 
             document.addEventListener("DOMContentLoaded", function(event) {
                 var ui = new UI(document);
-                new Controller(ui);
+                var controller = Controller(ui);
+                ui.btnShuffle.onclick = function() {
+                    controller.randomiseTiles();
+                }
+                ui.btnSolve.onclick = function() {
+                    controller.findSolution();
+                }; 
+                ui.btnStartPerformanceTest.onclick = function() {
+                    controller.testAlgorithmPerformance(1);
+                }
             });
 
         </script>

@@ -1,122 +1,25 @@
 if (!window.Worker) { alert('Please use a modern browser which supports HTML5 Web Workers'); } 
 
 var Controller = function(ui) {
-    var self = this;
-        
-    // ui actions
-    ui.btnShuffle.onclick = function() {
-        self.randomiseTiles();
-    }
-    ui.btnSolve.onclick = function() {
-        self.findSolution();
-    }; 
-    ui.btnStartPerformanceTest.onclick = function() {
-        self.testAlgorithmPerformance(1);
+    
+    // private properties
+    var tiles, testRunCounters = [];
+    
+    // private methods
+    function init() {
+        tiles = createTiles();
+        showAvailableTiles();
     }
     
-    // initialise properties
-    self.tiles = createTiles();
-    self.testRunCounters = new Array();
-    
-    // methods
-    self.init = function() {
-        self.showAvailableTiles();
-    }
-    
-    self.randomiseTiles = function() {
-        self.tiles.shuffle();
-        self.showAvailableTiles();
-    };
-    
-    self.showAvailableTiles = function() {
-        for (var i = 0; i < self.tiles.length; i++) {
+    function showAvailableTiles() {
+        for (var i = 0; i < tiles.length; i++) {
             var position = getPosition(i);
             // do a random rotation just for display purposes
             var rotation = Math.floor(4 * Math.random());
-            ui.placeTile(position.x, position.y, self.tiles[i], rotation);
+            ui.placeTile(position.x, position.y, tiles[i], rotation);
         }
     }
     
-    self.findSolution = function() {
-        // clear grid
-        for (var i = 0; i < self.tiles.length; i++) {
-            var position = getPosition(i);
-            ui.removeTile(position.x, position.y);
-        }
-
-        // reset counter
-        var counter = Counter();
-        counter.addOnValueChangedListener(function(val) {
-            ui.Counter.innerText = Utils.formatNumber(val);
-        });
-
-        var solverWorker = new Worker("js/solverWorker.js");
-        solverWorker.onerror = Utils.logError;
-        solverWorker.onmessage = function(evt) {
-            switch (evt.data.event) {
-                case 'onTileCheckedCountChanged': {
-                    counter.increment(evt.data.amount);
-                    return;
-                }
-                case 'onTilePlaced': {
-                    ui.placeTile(evt.data.position.x, evt.data.position.y, evt.data.tile.definition, evt.data.tile.rotation);
-                    return;
-                }
-                case 'onTileRemoved': {
-                    ui.removeTile(evt.data.position.x, evt.data.position.y);
-                    return;
-                }
-                case 'onSolutionFound': {
-                    solverWorker.terminate();
-                    return;
-                }
-            }
-        };
-        
-        // start worker 
-        solverWorker.postMessage({ tiles: self.tiles });
-    };
-    
-    self.testAlgorithmPerformance = function(runNumber) {
-        if (runNumber == 1) {
-            ui.TestAlgorithmPerformanceContainer.style.display = '';
-            ui.setStartTime();
-        }
-        
-        self.randomiseTiles();
-
-        var counter = Counter();
-        ui.addTestRun(runNumber, counter);
-        self.testRunCounters.push(counter);
-        
-        var solverWorker = new Worker("js/solverWorker.js");
-        solverWorker.onerror = Utils.logError;
-        solverWorker.onmessage = function(evt) {
-            switch (evt.data.event) {
-                case 'onTileCheckedCountChanged': {
-                    counter.increment(evt.data.amount);
-                    return;
-                }
-                case 'onSolutionFound': {
-                    solverWorker.terminate();
-                    if (runNumber < 10) {
-                        self.testAlgorithmPerformance(runNumber + 1);
-                    }
-                    else {
-                        ui.setEndTime();
-                        ui.addFooter(getAverageOfTestRuns(self.testRunCounters));
-                    }
-                    return;
-                }
-            }
-        }; 
-
-        solverWorker.postMessage({ tiles: self.tiles, subscribedEvents: ['onTileCheckedCountChanged', 'onSolutionFound'] });    
-    }
-
-    // run init    
-    self.init();
-
     // static helpers    
     function createTiles() {
         var tiles = new Array();
@@ -150,5 +53,93 @@ var Controller = function(ui) {
         }
         var average = sum / testRuns.length;
         return Math.round(average);
+    }
+    
+    // run init    
+    init();
+
+    // public methods
+    return {
+        findSolution: function() {
+            // clear grid
+            for (var i = 0; i < tiles.length; i++) {
+                var position = getPosition(i);
+                ui.removeTile(position.x, position.y);
+            }
+
+            // reset counter
+            var counter = Counter();
+            counter.addOnValueChangedListener(function(val) {
+                ui.Counter.innerText = Utils.formatNumber(val);
+            });
+
+            var solverWorker = new Worker("js/solverWorker.js");
+            solverWorker.onerror = Utils.logError;
+            solverWorker.onmessage = function(evt) {
+                switch (evt.data.event) {
+                    case 'onTileCheckedCountChanged': {
+                        counter.increment(evt.data.amount);
+                        return;
+                    }
+                    case 'onTilePlaced': {
+                        ui.placeTile(evt.data.position.x, evt.data.position.y, evt.data.tile.definition, evt.data.tile.rotation);
+                        return;
+                    }
+                    case 'onTileRemoved': {
+                        ui.removeTile(evt.data.position.x, evt.data.position.y);
+                        return;
+                    }
+                    case 'onSolutionFound': {
+                        solverWorker.terminate();
+                        return;
+                    }
+                }
+            };
+            
+            // start worker 
+            solverWorker.postMessage({ tiles: tiles });
+        },
+        randomiseTiles: function() {
+            tiles.shuffle();
+            showAvailableTiles();
+        },
+        testAlgorithmPerformance: function(runNumber) {
+            var self = this;
+            
+            if (runNumber == 1) {
+                ui.TestAlgorithmPerformanceContainer.style.display = '';
+                ui.setStartTime();
+            }
+            
+            self.randomiseTiles();
+
+            var counter = Counter();
+            ui.addTestRun(runNumber, counter);
+            testRunCounters.push(counter);
+            
+            var solverWorker = new Worker("js/solverWorker.js");
+            solverWorker.onerror = Utils.logError;
+            solverWorker.onmessage = function(evt) {
+                switch (evt.data.event) {
+                    case 'onTileCheckedCountChanged': {
+                        counter.increment(evt.data.amount);
+                        return;
+                    }
+                    case 'onSolutionFound': {
+                        solverWorker.terminate();
+                        if (runNumber < 10) {
+                            self.testAlgorithmPerformance(runNumber + 1);
+                        }
+                        else {
+                            ui.setEndTime();
+                            ui.addFooter(getAverageOfTestRuns(testRunCounters));
+                        }
+                        return;
+                    }
+                }
+            }; 
+
+            solverWorker.postMessage({ tiles: tiles, subscribedEvents: ['onTileCheckedCountChanged', 'onSolutionFound'] });    
+        }
     }
 };
