@@ -12,6 +12,12 @@ body {
     background-color: #BDE5F8;
 }
 
+img.monkey-face {
+    width: 24px;
+    height: 24px;
+    margin: -6px 0;
+}
+
 #algorithmPerformanceResults {
     text-align: center;
     border: 1px solid black;
